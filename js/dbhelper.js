@@ -8,8 +8,8 @@ class DBHelper {
    * Change this to restaurants.json file location on your server.
    */
   static get DATABASE_URL() {
-    const port = 7000 // Change this to your server port
-    return `http://localhost:${port}/data/restaurants.json`;
+    const path = window.location.hostname === "hallya.github.io" ? 'data/restaurants.json' : 'http://localhost:7000/data/restaurants.json';// Change this to your server port
+    return path;
   }
 
   /**
