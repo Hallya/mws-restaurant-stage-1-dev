@@ -3,19 +3,68 @@ let restaurants,
   cuisines
 var map
 var markers = []
+const mainContent = document.querySelector('main'),
+      footer = document.querySelector('footer'),
+      filterOptions = document.querySelector('.filter-options'),
+      filterResultHeading = document.querySelector('.filter-options h2'),
+      filterButton = document.querySelector('#menuFilter'),
+      listOfRestaurants = document.querySelector('#restaurants-list'),
+      sectionRestaurantsList = document.querySelector('#list-container'),
+      sectionMap = document.querySelector('#map-container'),
+      firstSelectElement = document.querySelector('#neighborhoods-select'),
+      secondSelectElement = document.querySelector('#cuisines-select');
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
-document.addEventListener('DOMContentLoaded', (event) => {
-  fetchNeighborhoods();
-  fetchCuisines();
-});
+
+document.onkeypress = function (e) {
+  console.log(e.code);
+  if (e.charCode === 13 && filterOptions.classList.contains('optionsOpen') ) {
+    closeMenu();
+    console.log(sectionMap.clientHeight);
+    listOfRestaurants.setAttribute('tabindex', '0');
+    listOfRestaurants.focus();
+    // window.scrollTo(0, sectionMap.clientHeight*2);
+  }
+}
+function openMenu() {
+  filterOptions.classList.remove('optionsClose');
+  mainContent.classList.remove('moveUp');
+  footer.classList.remove('moveUp');
+  filterOptions.classList.add('optionsOpen');
+  filterOptions.setAttribute('aria-hidden', 'false');
+  mainContent.classList.add('moveDown');
+  footer.classList.add('moveDown');
+  filterButton.classList.add('pressed');
+  filterButton.blur();
+  filterResultHeading.setAttribute('tabindex', '-1');
+  filterResultHeading.focus();
+}
+function closeMenu() {
+  filterOptions.classList.remove('optionsOpen');
+  filterOptions.classList.add('optionsClose');
+  filterOptions.setAttribute('aria-hidden', 'true');
+  filterButton.classList.remove('pressed');
+  mainContent.classList.remove('moveDown');
+  mainContent.classList.add('moveUp');
+  footer.classList.remove('moveDown');
+  footer.classList.add('moveUp');
+  filterResultHeading.removeAttribute('tabindex');
+}
+
+filterButton.addEventListener('click', () => {
+  if (filterOptions.classList.contains('optionsClose')){
+    openMenu();
+  } else {
+    closeMenu();
+  }
+})
 
 /**
  * Fetch all neighborhoods and set their HTML.
  */
-fetchNeighborhoods = () => {
+const fetchNeighborhoods = () => {
   DBHelper.fetchNeighborhoods((error, neighborhoods) => {
     if (error) { // Got an error
       console.error(error);
@@ -31,14 +80,17 @@ fetchNeighborhoods = () => {
  */
 fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
   const select = document.getElementById('neighborhoods-select');
+  let value = 2;
   neighborhoods.forEach(neighborhood => {
     const option = document.createElement('option');
     option.innerHTML = neighborhood;
     option.value = neighborhood;
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-setsize", neighborhoods.length);
     select.append(option);
+    value++;
   });
 }
-
 /**
  * Fetch all cuisines and set their HTML.
  */
@@ -58,12 +110,15 @@ fetchCuisines = () => {
  */
 fillCuisinesHTML = (cuisines = self.cuisines) => {
   const select = document.getElementById('cuisines-select');
-
+  let value = 2;
   cuisines.forEach(cuisine => {
     const option = document.createElement('option');
+    option.setAttribute("role", "option");
     option.innerHTML = cuisine;
     option.value = cuisine;
+    option.setAttribute('aria-setsize', cuisines.length);
     select.append(option);
+    value++;
   });
 }
 
@@ -128,6 +183,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
+    ul.setAttribute('aria-setsize', restaurants.length);
   });
   addMarkersToMap();
 }
@@ -138,14 +194,18 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
 
+  const figure = document.createElement('figure');
+  const figcaption = document.createElement('figcaption');
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  li.append(image);
-
+  image.alt = '';
+  figure.append(image);
+  figure.append(figcaption);
+  li.append(figure);
   const name = document.createElement('h1');
   name.innerHTML = restaurant.name;
-  li.append(name);
+  figcaption.append(name);
 
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;
@@ -158,6 +218,7 @@ createRestaurantHTML = (restaurant) => {
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
+  more.setAttribute('aria-label', `View details of ${restaurant.name}`)
   li.append(more)
 
   return li
@@ -176,3 +237,8 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     self.markers.push(marker);
   });
 }
+
+document.addEventListener('DOMContentLoaded', (event) => {
+  fetchNeighborhoods();
+  fetchCuisines();
+});

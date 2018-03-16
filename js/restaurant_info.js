@@ -54,13 +54,20 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
+  address.setAttribute('aria-label', `located at ${restaurant.address}`);
 
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img'
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.alt = '';
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
+  const labelFoodType = document.createElement('label');
+  labelFoodType.innerHTML = `${restaurant.cuisine_type} food`;
+  labelFoodType.setAttribute('hidden', 'hidden');
+  labelFoodType.id = 'foodType';
+  cuisine.parentNode.insertBefore(labelFoodType, cuisine.nextSibling);
 
   // fill operating hours
   if (restaurant.operating_hours) {
@@ -80,12 +87,14 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 
     const day = document.createElement('td');
     day.innerHTML = key;
+    day.setAttribute('aria-label', `open on ${key}`);
     row.appendChild(day);
 
     const time = document.createElement('td');
     time.innerHTML = operatingHours[key];
+    time.setAttribute('aria-label', `${operatingHours[key]},`);
     row.appendChild(time);
-
+    row.setAttribute('role', 'row');
     hours.appendChild(row);
   }
 }
@@ -118,21 +127,35 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 createReviewHTML = (review) => {
   const li = document.createElement('li');
   const name = document.createElement('p');
+  name.className = 'userName';
   name.innerHTML = review.name;
+  name.setAttribute('aria-label', `${review.name},`);
   li.appendChild(name);
 
   const date = document.createElement('p');
+  date.className = "dateReview";
   date.innerHTML = review.date;
+  date.setAttribute('aria-label', `${review.date},`)
   li.appendChild(date);
 
   const rating = document.createElement('p');
-  rating.innerHTML = `Rating: ${review.rating}`;
+  let stars = document.createElement('span');
+  rating.className = 'userRating';
+  stars.className = 'ratingStars';
+  for (let i = 0; i < review.rating; i++){
+    stars.innerHTML += '&#9733';
+  }
+  stars.setAttribute('aria-label', `${review.rating} stars on 5,`);
+  rating.innerHTML = `Rating: `;
+  rating.appendChild(stars);
   li.appendChild(rating);
 
   const comments = document.createElement('p');
+  comments.className = 'userComments';
   comments.innerHTML = review.comments;
   li.appendChild(comments);
 
+  li.setAttribute('role', 'listitem');
   return li;
 }
 
