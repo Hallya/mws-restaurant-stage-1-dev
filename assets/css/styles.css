@@ -339,7 +339,7 @@ nav button {
   width: 100%;
 }
 #restaurant-container h1, h2 {
-  padding: 3%;
+  padding: 2%;
 }
 #reviews-container {
   background-color: white;
@@ -480,7 +480,7 @@ nav button {
     font-size: 1.5em;
   }
   #restaurant-name {
-    width: 56%;
+    width: 58%;
   }
   #restaurants-list {
     display: flex;
