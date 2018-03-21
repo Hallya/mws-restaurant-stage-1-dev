@@ -1,8 +1,9 @@
 let restaurants,
   neighborhoods,
-  cuisines
-var map
-var markers = []
+  cuisines;
+
+var map;
+var markers = [];
 const mainContent = document.querySelector('main'),
       footer = document.querySelector('footer'),
       filterOptions = document.querySelector('.filter-options'),
@@ -17,6 +18,14 @@ const mainContent = document.querySelector('main'),
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(registration => {
+      console.log('registration to serviceWorker complete with scope :', registration.scope);
+    });
+  });
+}
 
 document.onkeypress = function (e) {
   console.log(e.code);
