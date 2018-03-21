@@ -1,11 +1,11 @@
 const CACHE_NAME = 'static-cache-v1';
 const urlToCache = [
-  '/',
-  '/assets/css/iconicfill.ttf',
-  '/assets/css/styles.css',
-  '/js/main.js',
-  '/js/dbhelper.js',
-  '/js/restaurant_info.js'
+  './',
+  'assets/css/iconicfill.ttf',
+  'assets/css/styles.css',
+  'js/main.js',
+  'js/dbhelper.js',
+  'js/restaurant_info.js'
 ];
 
 self.addEventListener('install', event => {

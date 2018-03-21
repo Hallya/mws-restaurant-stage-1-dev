@@ -21,7 +21,7 @@ const mainContent = document.querySelector('main'),
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then(registration => {
+    navigator.serviceWorker.register('sw.js').then(registration => {
       console.log('registration to serviceWorker complete with scope :', registration.scope);
     });
   });
