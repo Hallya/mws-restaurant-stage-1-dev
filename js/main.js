@@ -205,13 +205,35 @@ createRestaurantHTML = (restaurant) => {
 
   const figure = document.createElement('figure');
   const figcaption = document.createElement('figcaption');
+  const picture = document.createElement('picture');
+  const source = document.createElement('source');
+  const ndSource = document.createElement('source');
+  const thSource = document.createElement('source');
   const image = document.createElement('img');
+
+  source.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-large_x2.jpg 2x`;
+  source.media = "(min-width: 1000px)";
+  
+  ndSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x2.jpg 2x`
+  ndSource.media = "(min-width: 420px)";
+  
+  thSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-small_x2.jpg 2x, ${DBHelper.imageUrlForRestaurant(restaurant)}-small_x1.jpg 1x`
+  thSource.media = "(min-width: 320px)";
+  
   image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg`;
+  image.setAttribute("sizes", "(max-width: 1100px) 85vw, (min-width: 1101px) 990px");
   image.alt = '';
-  figure.append(image);
+  
+  picture.append(source);
+  picture.append(ndSource);
+  picture.append(thSource);
+  picture.append(image);
+  figure.append(picture);
   figure.append(figcaption);
+  
   li.append(figure);
+  
   const name = document.createElement('h1');
   name.innerHTML = restaurant.name;
   figcaption.append(name);

@@ -3,11 +3,7 @@
   "version": "1.0.0",
   "description": "--- #### _Three Stage Course Material Project - Restaurant Reviews_",
   "main": "main.js",
-  "scripts": {
-    "dev": "webpack --mode development --watch",
-    "start": "webpack-dashboard webpack-dev-server -d --hot --config webpack.config.js --watch",
-    "prod": "webpack --mode production"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Hallya/mws-restaurant-stage-1.git"
@@ -21,15 +17,13 @@
   "devDependencies": {
     "cross-env": "^5.1.4",
     "css-loader": "^0.28.11",
-    "gulp": "^3.9.1",
-    "gulp-srcset": "^1.2.0",
-    "uglifyjs-webpack-plugin": "^1.2.3",
-    "webpack": "^4.1.1",
-    "webpack-cli": "^2.0.12",
-    "webpack-dashboard": "^1.1.1",
-    "webpack-dev-server": "^3.1.1"
+    "grunt": "^1.0.2",
+    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-imageoptim": "^1.4.4",
+    "grunt-mkdir": "^1.0.0"
   },
   "dependencies": {
-    "imagemin": "^5.3.1"
+    "grunt-responsive-images": "^1.10.1"
   }
 }
