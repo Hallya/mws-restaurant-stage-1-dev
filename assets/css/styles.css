@@ -454,6 +454,8 @@ nav button {
   }
   nav h1 a {
     font-size: 1.3em;
+    background-color: #c00000;
+    border-radius: 25px;
   }
 }
 @media screen and (min-width: 1000px) {

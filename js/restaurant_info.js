@@ -143,7 +143,7 @@ createReviewHTML = (review) => {
   rating.className = 'userRating';
   stars.className = 'ratingStars';
   for (let i = 0; i < review.rating; i++){
-    stars.innerHTML += '&#9733';
+    stars.innerHTML += "★";
   }
   stars.setAttribute('aria-label', `${review.rating} stars on 5,`);
   rating.innerHTML = `Rating: `;
