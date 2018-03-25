@@ -223,7 +223,7 @@ createRestaurantHTML = (restaurant) => {
   image.className = 'restaurant-img';
   image.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg`;
   image.setAttribute("sizes", "(max-width: 1100px) 85vw, (min-width: 1101px) 990px");
-  image.alt = '';
+  image.alt = `${restaurant.name}'s restaurant`;
   
   picture.append(source);
   picture.append(ndSource);
@@ -234,7 +234,7 @@ createRestaurantHTML = (restaurant) => {
   
   li.append(figure);
   
-  const name = document.createElement('h1');
+  const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
   figcaption.append(name);
 
