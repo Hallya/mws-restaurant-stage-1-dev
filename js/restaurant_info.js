@@ -56,9 +56,22 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   address.innerHTML = restaurant.address;
   address.setAttribute('aria-label', `located at ${restaurant.address}`);
 
+  const source = document.getElementById('restaurant-source');
+  source.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-large_x2.jpg 2x`;
+  source.media = "(min-width: 1000px)";
+
+  const ndSource = document.getElementById('restaurant-ndSource');
+  ndSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x2.jpg 2x`
+  ndSource.media = "(min-width: 420px)";
+
+  const thSource = document.getElementById('restaurant-thSource');
+  thSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-small_x2.jpg 2x, ${DBHelper.imageUrlForRestaurant(restaurant)}-small_x1.jpg 1x`
+  thSource.media = "(min-width: 320px)";
+
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img'
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg`;
+  image.setAttribute("sizes", "(max-width: 1100px) 85vw, (min-width: 1101px) 990px");
   image.alt = '';
 
   const cuisine = document.getElementById('restaurant-cuisine');

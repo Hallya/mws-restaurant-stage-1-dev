@@ -28,9 +28,18 @@
       <div id="map" aria-hidden="true" tabindex="-1"></div>
     </section>
     <section id="restaurant-container" aria-label="restaurant details">
-      <h1 id="restaurant-name"></h1>
-      <img id="restaurant-img">
-      <p id="restaurant-cuisine" tabindex="1" aria-labelledby="foodType"></p>
+      <figure>
+        <h1 id="restaurant-name"></h1>
+        <picture>
+          <source id="restaurant-source"/>
+          <source id="restaurant-ndSource"/>
+          <source id="restaurant-thSource"/>
+          <img id="restaurant-img">
+        </picture>
+        <figcaption>
+          <p id="restaurant-cuisine" tabindex="1" aria-labelledby="foodType"></p>
+        </figcaption>
+      </figure>
       <p id="restaurant-address" tabindex="2"></p>
       <table id="restaurant-hours" role="table" tabindex="3"></table>
     </section>
