@@ -153,7 +153,7 @@ class DBHelper {
     return (`assets/img_resized/${restaurant.photograph}`);
   }
 
-  /**
+  /**q
    * Map marker for a restaurant.
    */
   static mapMarkerForRestaurant(restaurant, map) {

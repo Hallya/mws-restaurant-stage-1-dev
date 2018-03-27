@@ -5,7 +5,8 @@ const urlToCache = [
   'assets/css/styles.css',
   'js/main.js',
   'js/dbhelper.js',
-  'js/restaurant_info.js'
+  'js/restaurant_info.js',
+  'https://maps.googleapis.com/maps/api/js?key=AIzaSyAhh8UfYBFgAt3jlejXNTbrAuCnJqQtIPc&libraries=places&callback=initMap'
 ];
 
 self.addEventListener('install', event => {
@@ -22,7 +23,6 @@ self.addEventListener('fetch', event => {
       if (response) {
         return response;
       }
-
       const fetchClone = event.request.clone();
 
       return fetch(fetchClone).then(response => {
@@ -32,7 +32,7 @@ self.addEventListener('fetch', event => {
         const responseToCache = response.clone();
         caches.open(CACHE_NAME)
           .then(cache => {
-            cache.put(event.request, responseToCache)
+            cache.put(event.request, responseToCache);
           }, error => console.error('failed to add request to cache :', error));
         return response
       });

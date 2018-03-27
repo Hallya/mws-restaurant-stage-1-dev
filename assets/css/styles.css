@@ -232,7 +232,7 @@ nav button {
   margin: 0;
   width: 100%;
   max-width: 100%;
-  min-height: 248px;
+  height: auto;
   border-top-right-radius: 25px;
   border-top-left-radius: 25px;
 }
