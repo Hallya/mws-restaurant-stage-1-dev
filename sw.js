@@ -5,8 +5,8 @@ const urlToCache = [
   'assets/css/styles.css',
   'js/main.js',
   'js/dbhelper.js',
-  'js/restaurant_info.js',
-  'https://maps.googleapis.com/maps/api/js?key=AIzaSyAhh8UfYBFgAt3jlejXNTbrAuCnJqQtIPc&libraries=places&callback=initMap'
+  'js/restaurant_info.js'
+  // 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAhh8UfYBFgAt3jlejXNTbrAuCnJqQtIPc&libraries=places&callback=initMap'
 ];
 
 self.addEventListener('install', event => {
@@ -18,24 +18,48 @@ self.addEventListener('install', event => {
 })
 
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      if (response) {
-        return response;
-      }
-      const fetchClone = event.request.clone();
-
-      return fetch(fetchClone).then(response => {
-        if (!response || response.status !== 200 || response.type !== 'basic') {
-          return response
+  if (event.request.url.indexOf('https://maps.') > -1) {
+    event.respondWith(
+      caches.match(event.request).then(response => {
+        if (response) {
+          return response;
         }
-        const responseToCache = response.clone();
-        caches.open(CACHE_NAME)
-          .then(cache => {
-            cache.put(event.request, responseToCache);
-          }, error => console.error('failed to add request to cache :', error));
-        return response
-      });
-    })
-  )
+        const fetchClone = event.request.clone();
+
+        return fetch(fetchClone, { mode: 'no-cors' }).then(response => {
+          if (!response) {
+            return response
+          }
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => {
+              console.log(responseToCache)
+              cache.put(event.request, responseToCache);
+            }, error => console.error('failed to add request to cache :', error));
+          return response
+        });
+      })
+    )
+  } else {
+    event.respondWith(
+      caches.match(event.request).then(response => {
+        if (response) {
+          return response;
+        }
+        const fetchClone = event.request.clone();
+
+        return fetch(fetchClone).then(response => {
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+            return response
+          }
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => {
+              cache.put(event.request, responseToCache);
+            }, error => console.error('failed to add request to cache :', error));
+          return response
+        });
+      })
+    )
+  }
 })
