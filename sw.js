@@ -1,4 +1,4 @@
-const CACHE_STATIC = `static-cache-v4`;
+const CACHE_STATIC = `static-cache-v5`;
 const urlToCache = [
   './',
   'assets/css/iconicfill.ttf',
@@ -14,7 +14,7 @@ self.addEventListener('install', event => {
     caches.open(CACHE_STATIC)
       .then(cache => {
         return cache.addAll(urlToCache.map(url => {
-          return new Request(url, {mode: 'no-cors'});
+          return new Request(url.href, {mode: 'no-cors'});
         })).then(() => console.log('All resources fetched and cached.'));
       })
       .catch(error => console.error('Open cache failed :', error))
