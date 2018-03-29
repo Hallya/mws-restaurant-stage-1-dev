@@ -1,4 +1,4 @@
-const CACHE_STATIC = `static-cache-v6`;
+const CACHE_STATIC = `static-cache-v7`;
 const urlToCache = [
   './',
   'assets/css/iconicfill.ttf',
@@ -48,7 +48,7 @@ self.addEventListener('fetch', event => {
   }else {
     event.respondWith(
       caches.open(CACHE_STATIC).then(cache => {
-        return cache.match(url).then(res => {
+        return cache.match(url.pathname).then(res => {
           return res || fetch(event.request).then(response => {
             cache.put(event.request, response.clone()); 
             return response;
