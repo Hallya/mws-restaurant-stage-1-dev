@@ -30,7 +30,7 @@ self.addEventListener('activate', function (event) {
         }
       })
     )).then(() => {
-      console.log('V2 now ready to handle fetches!');
+      console.log(`${CACHE_STATIC} now ready to handle fetches!`);
     })
   );
 });
