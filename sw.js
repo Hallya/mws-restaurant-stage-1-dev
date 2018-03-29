@@ -1,4 +1,4 @@
-const CACHE_STATIC = `static-cache-v13`;
+const CACHE_STATIC = `static-cache-v14`;
 const urlToCache = [
   './',
   'assets/css/iconicfill.ttf',
