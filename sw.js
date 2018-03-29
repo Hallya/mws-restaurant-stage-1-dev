@@ -12,11 +12,8 @@ self.addEventListener('install', event => {
   console.log(`cache version : ${CACHE_STATIC}`);
   event.waitUntil(
     caches.open(CACHE_STATIC)
-      .then(cache => {
-        return cache.addAll(urlToCache.map(url => {
-          return new Request(url.href, {mode: 'no-cors'});
-        })).then(() => console.log('All resources fetched and cached.'));
-      })
+      .then(cache => cache.addAll(urlToCache))
+      .then(() => console.log('All resources fetched and cached.'))
       .catch(error => console.error('Open cache failed :', error))
   );
 })
