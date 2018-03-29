@@ -18,7 +18,6 @@ const mainContent = document.querySelector('main'),
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
-
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(registration => {

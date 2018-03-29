@@ -1,4 +1,4 @@
-const CACHE_NAME = 'static-cache-v1';
+const CACHE_STATIC = `static-cache-v3`;
 const urlToCache = [
   './',
   'assets/css/iconicfill.ttf',
@@ -6,60 +6,58 @@ const urlToCache = [
   'js/main.js',
   'js/dbhelper.js',
   'js/restaurant_info.js'
-  // 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAhh8UfYBFgAt3jlejXNTbrAuCnJqQtIPc&libraries=places&callback=initMap'
 ];
 
 self.addEventListener('install', event => {
+  console.log(`cache version : ${CACHE_STATIC}`);
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(urlToCache);
-    }, error => console.error('Open cache failed :', error))
+    caches.open(CACHE_STATIC)
+      .then(cache => {
+        return cache.addAll(urlToCache.map(url => {
+          return new Request(url, {mode: 'no-cors'});
+        })).then(() => console.log('All resources fetched and cached.'));
+      })
+      .catch(error => console.error('Open cache failed :', error))
   );
 })
 
+self.addEventListener('activate', function (event) {
+  event.waitUntil(
+    caches.keys().then(keys => Promise.all(
+      keys.map(key => {
+        if (key !== CACHE_STATIC) {
+          return caches.delete(key);
+        }
+      })
+    )).then(() => {
+      console.log('V2 now ready to handle fetches!');
+    })
+  );
+});
+
 self.addEventListener('fetch', event => {
-  if (event.request.url.indexOf('https://maps.') > -1) {
+  const url = new URL(event.request.url);
+  if (url.hostname.indexOf('maps') > -1) {
     event.respondWith(
-      caches.match(event.request).then(response => {
-        if (response) {
-          return response;
-        }
-        const fetchClone = event.request.clone();
-
-        return fetch(fetchClone, { mode: 'no-cors' }).then(response => {
-          if (!response) {
-            return response
-          }
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              console.log(responseToCache)
-              cache.put(event.request, responseToCache);
-            }, error => console.error('failed to add request to cache :', error));
-          return response
+      caches.open(CACHE_STATIC).then(function (cache) {
+        return cache.match(event.request).then(res => {
+          return res || fetch(url.href, { mode: 'no-cors'}).then(response => {
+            cache.put(event.request, response.clone());
+            return response;
+          }, error => console.error(error));
         });
       })
-    )
-  } else {
+    );
+  }else {
     event.respondWith(
-      caches.match(event.request).then(response => {
-        if (response) {
-          return response;
-        }
-        const fetchClone = event.request.clone();
-
-        return fetch(fetchClone).then(response => {
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response
-          }
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
-            }, error => console.error('failed to add request to cache :', error));
-          return response
+      caches.open(CACHE_STATIC).then(cache => {
+        return cache.match(url).then(res => {
+          return res || fetch(event.request).then(response => {
+            cache.put(event.request, response.clone()); 
+            return response;
+          });
         });
       })
-    )
+    );
   }
 })
