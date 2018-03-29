@@ -1,4 +1,4 @@
-const CACHE_STATIC = `static-cache-v7`;
+const CACHE_STATIC = `static-cache-v13`;
 const urlToCache = [
   './',
   'assets/css/iconicfill.ttf',
@@ -11,6 +11,7 @@ const urlToCache = [
 self.addEventListener('install', event => {
   console.log(`cache version : ${CACHE_STATIC}`);
   event.waitUntil(
+    self.skipWaiting(),
     caches.open(CACHE_STATIC)
       .then(cache => cache.addAll(urlToCache))
       .then(() => console.log('All resources fetched and cached.'))
@@ -45,14 +46,14 @@ self.addEventListener('fetch', event => {
         });
       })
     );
-  }else {
+  } else {
     event.respondWith(
       caches.open(CACHE_STATIC).then(cache => {
-        return cache.match(url.pathname).then(res => {
-          return res || fetch(event.request).then(response => {
+        return cache.match(event.request).then(res => {
+          return res || fetch(url.href).then(response => {
             cache.put(event.request, response.clone()); 
             return response;
-          });
+          }, error => console.error(error));
         });
       })
     );
