@@ -5,7 +5,17 @@ const urlToCache = [
   'assets/css/styles.css',
   'js/main.js',
   'js/dbhelper.js',
-  'js/restaurant_info.js'
+  'js/restaurant_info.js',
+  'assets/img_resized/1-large_x1.jpg',
+  'assets/img_resized/2-large_x1.jpg',
+  'assets/img_resized/3-large_x1.jpg',
+  'assets/img_resized/4-large_x1.jpg',
+  'assets/img_resized/5-large_x1.jpg',
+  'assets/img_resized/6-large_x1.jpg',
+  'assets/img_resized/7-large_x1.jpg',
+  'assets/img_resized/8-large_x1.jpg',
+  'assets/img_resized/9-large_x1.jpg',
+  'assets/img_resized/10-large_x1.jpg',
 ];
 
 self.addEventListener('install', event => {
