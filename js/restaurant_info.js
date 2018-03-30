@@ -1,6 +1,13 @@
 let restaurant;
 var map;
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(registration => {
+      console.log('registration to serviceWorker complete with scope :', registration.scope);
+    });
+  });
+}
 /**
  * Initialize Google map, called from HTML.
  */
@@ -112,13 +119,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
   }
 }
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').then(registration => {
-      console.log('registration to serviceWorker complete with scope :', registration.scope);
-    });
-  });
-}
+
 /**
  * Create all reviews HTML and add them to the webpage.
  */
