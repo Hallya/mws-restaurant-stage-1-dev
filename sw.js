@@ -15,7 +15,7 @@ const urlToCache = [
   'assets/img_resized/7-large_x1.jpg',
   'assets/img_resized/8-large_x1.jpg',
   'assets/img_resized/9-large_x1.jpg',
-  'assets/img_resized/10-large_x1.jpg',
+  'assets/img_resized/10-large_x1.jpg'
 ];
 
 self.addEventListener('install', event => {
