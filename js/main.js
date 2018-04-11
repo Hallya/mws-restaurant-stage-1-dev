@@ -1,22 +1,33 @@
-let restaurants,
-  neighborhoods,
-  cuisines;
+/* global DBHelper */
+let restaurants;
+let neighborhoods;
+let cuisines;
 
-var map;
+// var map;
 var markers = [];
+
 const mainContent = document.querySelector('main'),
-      footer = document.querySelector('footer'),
-      filterOptions = document.querySelector('.filter-options'),
-      filterResultHeading = document.querySelector('.filter-options h2'),
-      filterButton = document.querySelector('#menuFilter'),
-      listOfRestaurants = document.querySelector('#restaurants-list'),
-      sectionRestaurantsList = document.querySelector('#list-container'),
-      sectionMap = document.querySelector('#map-container'),
-      firstSelectElement = document.querySelector('#neighborhoods-select'),
-      secondSelectElement = document.querySelector('#cuisines-select');
+  footer = document.querySelector('footer'),
+  filterOptions = document.querySelector('.filter-options'),
+  filterResultHeading = document.querySelector('.filter-options h2'),
+  filterButton = document.querySelector('#menuFilter'),
+  listOfRestaurants = document.querySelector('#restaurants-list'),
+  // sectionRestaurantsList = document.querySelector('#list-container'),
+  sectionMap = document.querySelector('#map-container'),
+  neighborhoodsSelect = document.querySelector('#neighborhoods-select'),
+  cuisinesSelect = document.querySelector('#cuisines-select');
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+  fetchNeighborhoods();
+  fetchCuisines();
+});
+
+
+/**
+ * Register to service worker if the browser is compatible.
  */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -28,14 +39,15 @@ if ('serviceWorker' in navigator) {
 
 document.onkeypress = function (e) {
   console.log(e.code);
-  if (e.charCode === 13 && filterOptions.classList.contains('optionsOpen') ) {
+  if (e.charCode === 13 && filterOptions.classList.contains('optionsOpen')) {
     closeMenu();
     console.log(sectionMap.clientHeight);
     listOfRestaurants.setAttribute('tabindex', '0');
     listOfRestaurants.focus();
     // window.scrollTo(0, sectionMap.clientHeight*2);
   }
-}
+};
+
 function openMenu() {
   filterOptions.classList.remove('optionsClose');
   mainContent.classList.remove('moveUp');
@@ -49,6 +61,7 @@ function openMenu() {
   filterResultHeading.setAttribute('tabindex', '-1');
   filterResultHeading.focus();
 }
+
 function closeMenu() {
   filterOptions.classList.remove('optionsOpen');
   filterOptions.classList.add('optionsClose');
@@ -62,73 +75,65 @@ function closeMenu() {
 }
 
 filterButton.addEventListener('click', () => {
-  if (filterOptions.classList.contains('optionsClose')){
+  if (filterOptions.classList.contains('optionsClose')) {
     openMenu();
   } else {
     closeMenu();
   }
-})
+});
 
 /**
  * Fetch all neighborhoods and set their HTML.
  */
 const fetchNeighborhoods = () => {
-  DBHelper.fetchNeighborhoods((error, neighborhoods) => {
-    if (error) { // Got an error
-      console.error(error);
-    } else {
+  DBHelper.fetchNeighborhoods()
+    .then(neighborhoods => {
       self.neighborhoods = neighborhoods;
       fillNeighborhoodsHTML();
-    }
-  });
-}
+    })
+    .catch(error => console.error(error));
+};
 
 /**
  * Set neighborhoods HTML.
  */
-fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
-  const select = document.getElementById('neighborhoods-select');
-  let value = 2;
+const fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
+  const select = neighborhoodsSelect;
   neighborhoods.forEach(neighborhood => {
     const option = document.createElement('option');
     option.innerHTML = neighborhood;
     option.value = neighborhood;
-    option.setAttribute("role", "option");
-    option.setAttribute("aria-setsize", neighborhoods.length);
+    option.setAttribute('role', 'option');
+    option.setAttribute('aria-setsize', neighborhoods.length);
     select.append(option);
-    value++;
   });
-}
+};
 /**
  * Fetch all cuisines and set their HTML.
  */
-fetchCuisines = () => {
-  DBHelper.fetchCuisines((error, cuisines) => {
-    if (error) { // Got an error!
-      console.error(error);
-    } else {
+const fetchCuisines = () => {
+  DBHelper.fetchCuisines()
+    .then(cuisines => {
       self.cuisines = cuisines;
       fillCuisinesHTML();
-    }
-  });
-}
+    })
+    .catch(error => console.error(error));
+};
 
 /**
  * Set cuisines HTML.
  */
-fillCuisinesHTML = (cuisines = self.cuisines) => {
-  const select = document.getElementById('cuisines-select');
-  let value = 2;
+const fillCuisinesHTML = (cuisines = self.cuisines) => {
+  const select = cuisinesSelect;
   cuisines.forEach(cuisine => {
     const option = document.createElement('option');
-    option.setAttribute("role", "option");
+    option.setAttribute('role', 'option');
     option.innerHTML = cuisine;
     option.value = cuisine;
     option.setAttribute('aria-setsize', cuisines.length);
     select.append(option);
-    value++;
   });
-}
+};
 
 /**
  * Initialize Google map, called from HTML.
@@ -144,14 +149,14 @@ window.initMap = () => {
     scrollwheel: false
   });
   updateRestaurants();
-}
+};
 
 /**
  * Update page and map for current restaurants.
  */
-updateRestaurants = () => {
-  const cSelect = document.getElementById('cuisines-select');
-  const nSelect = document.getElementById('neighborhoods-select');
+const updateRestaurants = () => {
+  const cSelect = cuisinesSelect;
+  const nSelect = neighborhoodsSelect;
 
   const cIndex = cSelect.selectedIndex;
   const nIndex = nSelect.selectedIndex;
@@ -159,47 +164,45 @@ updateRestaurants = () => {
   const cuisine = cSelect[cIndex].value;
   const neighborhood = nSelect[nIndex].value;
 
-  DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
-    if (error) { // Got an error!
-      console.error(error);
-    } else {
+  DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
+    .then(restaurants => {
       resetRestaurants(restaurants);
       fillRestaurantsHTML();
-    }
-  })
-}
+    }).catch(error => console.error(error));
+};
 
 /**
  * Clear current restaurants, their HTML and remove their map markers.
  */
-resetRestaurants = (restaurants) => {
+const resetRestaurants = (restaurants) => {
   // Remove all restaurants
   self.restaurants = [];
   const ul = document.getElementById('restaurants-list');
   ul.innerHTML = '';
 
   // Remove all map markers
+
   self.markers.forEach(m => m.setMap(null));
   self.markers = [];
   self.restaurants = restaurants;
-}
+};
 
 /**
  * Create all restaurants HTML and add them to the webpage.
  */
-fillRestaurantsHTML = (restaurants = self.restaurants) => {
+const fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
     ul.setAttribute('aria-setsize', restaurants.length);
   });
   addMarkersToMap();
-}
+};
 
 /**
  * Create restaurant HTML.
  */
-createRestaurantHTML = (restaurant) => {
+const createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
 
   const figure = document.createElement('figure');
@@ -211,17 +214,16 @@ createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
 
   source.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-large_x2.jpg 2x`;
-  source.media = "(min-width: 1000px)";
+  source.media = '(min-width: 1000px)';
+  ndSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x2.jpg 2x`;
+  ndSource.media = '(min-width: 420px)';
   
-  ndSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x2.jpg 2x`
-  ndSource.media = "(min-width: 420px)";
-  
-  thSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-small_x2.jpg 2x, ${DBHelper.imageUrlForRestaurant(restaurant)}-small_x1.jpg 1x`
-  thSource.media = "(min-width: 320px)";
+  thSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-small_x2.jpg 2x, ${DBHelper.imageUrlForRestaurant(restaurant)}-small_x1.jpg 1x`;
+  thSource.media = '(min-width: 320px)';
   
   image.className = 'restaurant-img';
   image.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg`;
-  image.setAttribute("sizes", "(max-width: 1100px) 85vw, (min-width: 1101px) 990px");
+  image.setAttribute('sizes', '(max-width: 1100px) 85vw, (min-width: 1101px) 990px');
   image.alt = `${restaurant.name}'s restaurant`;
   
   picture.append(source);
@@ -248,27 +250,24 @@ createRestaurantHTML = (restaurant) => {
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
-  more.setAttribute('aria-label', `View details of ${restaurant.name}`)
-  li.append(more)
+  more.setAttribute('aria-label', `View details of ${restaurant.name}`);
+  li.append(more);
 
-  return li
-}
+  return li;
+};
 
 /**
  * Add markers for current restaurants to the map.
  */
-addMarkersToMap = (restaurants = self.restaurants) => {
+const addMarkersToMap = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     // Add marker to the map
     const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
     google.maps.event.addListener(marker, 'click', () => {
-      window.location.href = marker.url
+      window.location.href = marker.url;
     });
     self.markers.push(marker);
   });
-}
+};
 
-document.addEventListener('DOMContentLoaded', (event) => {
-  fetchNeighborhoods();
-  fetchCuisines();
-});
+

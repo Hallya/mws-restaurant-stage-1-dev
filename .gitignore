@@ -7,10 +7,16 @@
 /coverage
 
 # production
-/build
+!/dist
 
-# images
-/assets/img
+# development
+/assets
+/data
+/js
+*.html
+*.json
+*.js
+manifest.webmanifest
 
 # misc
 .DS_Store

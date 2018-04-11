@@ -1,21 +1,14 @@
-const CACHE_STATIC = `static-cache-v2`;
-const urlToCache = [
-  './',
+/*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
+
+const CACHE_STATIC = 'static-cache-6  ';
+const URLS_TO_CACHE = [
+  'index.html',
+  'restaurant.html',
   'assets/css/iconicfill.ttf',
   'assets/css/styles.css',
   'js/main.js',
-  'js/dbhelper.js',
   'js/restaurant_info.js',
-  'assets/img_resized/1-large_x1.jpg',
-  'assets/img_resized/2-large_x1.jpg',
-  'assets/img_resized/3-large_x1.jpg',
-  'assets/img_resized/4-large_x1.jpg',
-  'assets/img_resized/5-large_x1.jpg',
-  'assets/img_resized/6-large_x1.jpg',
-  'assets/img_resized/7-large_x1.jpg',
-  'assets/img_resized/8-large_x1.jpg',
-  'assets/img_resized/9-large_x1.jpg',
-  'assets/img_resized/10-large_x1.jpg'
+  'js/dbhelper.js'
 ];
 
 self.addEventListener('install', event => {
@@ -23,11 +16,11 @@ self.addEventListener('install', event => {
   event.waitUntil(
     self.skipWaiting(),
     caches.open(CACHE_STATIC)
-      .then(cache => cache.addAll(urlToCache))
+      .then(cache => cache.addAll(URLS_TO_CACHE))
       .then(() => console.log('All resources fetched and cached.'))
       .catch(error => console.error('Open cache failed :', error))
   );
-})
+});
 
 self.addEventListener('activate', function (event) {
   event.waitUntil(
@@ -45,12 +38,25 @@ self.addEventListener('activate', function (event) {
 
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
+  let newPath;
   if (url.hostname.indexOf('maps') > -1) {
     event.respondWith(
       caches.open(CACHE_STATIC).then(function (cache) {
         return cache.match(event.request).then(res => {
-          return res || fetch(url.href, { mode: 'no-cors'}).then(response => {
+          return res || fetch(url.href, { mode: 'no-cors' }).then(response => {
             cache.put(event.request, response.clone());
+            return response;
+          }, error => console.error(error));
+        });
+      })
+    );
+  } else if (url.href.indexOf('restaurant.html') > -1) {
+    newPath = url.href.replace(/[?&]id=\d/, '');
+    event.respondWith(
+      caches.open(CACHE_STATIC).then(cache => {
+        return cache.match(newPath).then(res => {
+          return res || fetch(event.request).then(response => {
+            cache.put(newPath, response.clone());
             return response;
           }, error => console.error(error));
         });
@@ -60,12 +66,12 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       caches.open(CACHE_STATIC).then(cache => {
         return cache.match(event.request).then(res => {
-          return res || fetch(url.href).then(response => {
-            cache.put(event.request, response.clone()); 
+          return res || fetch(event.request).then(response => {
+            cache.put(event.request, response.clone());
             return response;
           }, error => console.error(error));
         });
       })
     );
   }
-})
+});
