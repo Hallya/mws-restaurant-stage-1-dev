@@ -1,8 +1,9 @@
 /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 
-const CACHE_STATIC = 'static-cache-11';
+const CACHE_STATIC = 'static-cache-14';
 const URLS_TO_CACHE = [
   'index.html',
+  'manifest.json',
   'restaurant.html',
   'assets/css/iconicfill.ttf',
   'assets/css/styles.css',
