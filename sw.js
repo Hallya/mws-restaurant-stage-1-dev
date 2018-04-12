@@ -1,6 +1,6 @@
 /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 
-const CACHE_STATIC = 'static-cache-3';
+const CACHE_STATIC = 'static-cache-4';
 const URLS_TO_CACHE = [
   'index.html',
   'restaurant.html',
