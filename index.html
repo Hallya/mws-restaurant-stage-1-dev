@@ -23,23 +23,29 @@
       <h3 id="filters">Filter Results</h3>
       <label id="location" hidden>Choose your location</label>
       <select id="neighborhoods-select" aria-labelledby="location"  name="neighborhoods" onchange="updateRestaurants()">
-        <option value="all" role="option">All Neighborhoods</option>
+        <option value="all" role="option" aria-setsize="4" aria-posinset="1">All Neighborhoods</option>
       </select>
       <label id="cuisines" hidden>Choose your type of food</label>
       <select id="cuisines-select" aria-labelledby="cuisines" name="cuisines" onchange="updateRestaurants()">
-        <option value="all" role="option">All Cuisines</option>
+        <option value="all" role="option" aria-setsize="4" aria-posinset="1">All Cuisines</option>
       </select>
     </div>
   </header>
 
   <main id="maincontent">
     <a href="#list-container" aria-label="Skip to the list of restaurant" role="link"></a>
+    
     <section id="map-container" aria-label="map" role="application">
-      <div id="map" tabindex="-1" aria-hidden="true"></div>
+      <div id="map" class="hidden" tabindex="-1" aria-hidden="true"></div>
+      <div id="map-loader">
+        <img src="assets/img/svg/map-loader.svg" height="100%" width="100%">
+      </div>
     </section>
+    
     <section id="list-container" aria-label="list of restaurants">
-      <ul id="restaurants-list"></ul>
+      <ul id="restaurants-list" role="list"></ul>
     </section>
+
   </main>
   <footer id="footer">
     Copyright (c) 2017 <a href="index.html"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
