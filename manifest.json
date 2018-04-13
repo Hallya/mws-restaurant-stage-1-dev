@@ -3,7 +3,7 @@
   "dir": "ltr",
   "lang": "en",
   "short_name": "Rest Reviews",
-  "start_url": "./?utm_source=web_app_manifest",
+  "start_url": "index.html",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#252831",
@@ -12,23 +12,23 @@
   "prefer_related_applications": "false",
   "icons": [
     {
-      "src": "assets/img/logo-64.png",
+      "src": "assets/img/png/logo-64.png",
       "sizes": "64x64",
       "type": "image/png"
     },
     {
-      "src": "assets/img/logo-128.png",
+      "src": "assets/img/png/logo-128.png",
       "sizes": "128x128",
       "type": "image/png"
     },
     {
-      "src": "assets/img/logo-256.png",
+      "src": "assets/img/png/logo-256.png",
       "sizes": "256x256",
       "type": "image/png"
     },
     {
-      "src": "assets/img/logo-512.png",
-      "sizes": "512",
+      "src": "assets/img/png/logo-512.png",
+      "sizes": "512x512",
       "type": "image/png"
     }
   ]
