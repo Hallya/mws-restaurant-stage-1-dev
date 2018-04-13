@@ -2,7 +2,7 @@
   "name": "Restaurant reviews",
   "dir": "ltr",
   "lang": "en",
-  "short_name": "Rest Reviews",
+  "short_name": "Reviews",
   "start_url": "index.html",
   "display": "standalone",
   "orientation": "portrait-primary",
