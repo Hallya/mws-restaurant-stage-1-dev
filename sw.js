@@ -1,6 +1,6 @@
 /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 
-const CACHE_STATIC = 'static-cache-13';
+const CACHE_STATIC = 'static-cache-31';
 const URLS_TO_CACHE = [
   'index.html',
   'manifest.json',
@@ -12,6 +12,30 @@ const URLS_TO_CACHE = [
   'js/restaurant_info.js',
   'js/dbhelper.js'
 ];
+
+function send_message_to_all_clients(msg) {
+  clients.matchAll().then(clients => {
+    clients.forEach(client => {
+      send_message_to_client(client, msg)
+        .then(m => console.log(`SW Received Message: ${m}`));
+    });
+  });
+}
+function send_message_to_client(client, msg) {
+  return new Promise(function (resolve, reject) {
+    var msg_chan = new MessageChannel();
+
+    msg_chan.port1.onmessage = function (event) {
+      if (event.data.error) {
+        reject(event.data.error);
+      } else {
+        resolve(event.data);
+      }
+    };
+
+    client.postMessage(msg, [msg_chan.port2]);
+  });
+}
 
 self.addEventListener('install', event => {
   console.log(`cache version : ${CACHE_STATIC}`);
@@ -45,7 +69,14 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       caches.open(CACHE_STATIC).then(function (cache) {
         return cache.match(event.request).then(res => {
+          if (url.href.indexOf('spotlight-poi2') > -1 && res) {
+            send_message_to_all_clients({ message: 'confirmed'});
+          }
           return res || fetch(url.href, { mode: 'no-cors' }).then(response => {
+            if (url.href.indexOf('spotlight-poi2') > -1) {
+              send_message_to_all_clients({ message: 'confirmed' });
+              console.log('Message sent from SW to Client');
+            }
             cache.put(event.request, response.clone());
             return response;
           }, error => console.error(error));
@@ -76,4 +107,10 @@ self.addEventListener('fetch', event => {
       })
     );
   }
+});
+
+self.addEventListener('message', (event) => {
+  console.log('Message received from Client', event.data);
+
+  event.ports[0].postMessage('Service worker says Hello !');
 });
