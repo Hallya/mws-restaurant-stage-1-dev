@@ -3,7 +3,7 @@
   "name": "Restaurant reviews",
   "dir": "ltr",
   "lang": "en",
-  "start_url": "index.html?launcher=true",
+  "start_url": "/?utm_source=homescreen",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#252831",
