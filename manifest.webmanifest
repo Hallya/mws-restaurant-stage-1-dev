@@ -9,7 +9,7 @@
   "background_color": "#252831",
   "theme_color": "#252831",
   "description": "The reviews app that help you know where to eat !",
-  "prefer_related_applications": "false",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "assets/img/png/logo-64.png",
