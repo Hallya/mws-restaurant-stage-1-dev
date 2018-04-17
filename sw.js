@@ -1,5 +1,5 @@
 /*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
-const CACHE_STATIC = 'static-cache-1';
+const CACHE_STATIC = 'static-cache-2';
 const URLS_TO_CACHE = [
   'index.html',
   'manifest.webmanifest',
