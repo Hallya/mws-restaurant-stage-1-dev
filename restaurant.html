@@ -12,35 +12,35 @@
   <title>Restaurant Info</title>
 </head>
 
-<body class="inside" style="background-color: white; color: #252831; font-size: 16px; line-height: 1.5; margin: 0; max-width: 100%; width: 100%;">
-  <header style="background-color: #252831; display: block; height: 7em; max-width: 100%; width: 100%;">
+<body class="inside">
+  <header>
 
-    <nav style="-ms-flex-align: center; -ms-flex-pack: justify; -webkit-box-align: center; -webkit-box-pack: justify; align-items: center; background-color: #252831; display: flex; height: 65%; justify-content: space-between; max-width: 100%; text-align: center; width: 100%;">
-      <h1 style="font-family: 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold',sans-serif; margin-left: 5%; text-align: left; width: 80%;"><a href="index.html" style="color: #fff; font-size: 1em; letter-spacing: 5px; min-height: 48px; min-width: 48px; text-decoration: none; text-transform: uppercase;">Restaurant Reviews</a></h1>
+    <nav>
+      <h1><a href="index.html">Restaurant Reviews</a></h1>
     </nav>
-    <ul id="breadcrumb" aria-label="Breadcrumb" role="navigation" style="background-color: #252831; height: 30%; list-style: none; margin: 0; padding: 0; width: 100%;">
-      <li style="color: #fff; display: inline; font-family: 'Montserrat', sans-serif; font-size: 1em; padding-right: 5px;"><a href="index.html" style="color: #f58301; min-height: 48px; min-width: 48px; text-decoration: none;">Home</a></li>
+    <ul id="breadcrumb" aria-label="Breadcrumb" role="navigation">
+      <li><a href="index.html">Home</a></li>
     </ul>
 
   </header>
 
 
-  <main id="maincontent" style="background-color: #fff;">
+  <main id="maincontent">
     
-    <a href="#restaurant-container" aria-label="Skip to details" role="link" style="color: orange; min-height: 48px; min-width: 48px; text-decoration: none;"></a>
+    <a href="#restaurant-container" aria-label="Skip to details" role="link"></a>
     
     
-    <section id="map-container" aria-label="map" role="application" style="-webkit-transition: 0.2s; background-color: #252831; display: block; height: 200px; max-width: 100%; position: relative; transition: 0.2s; width: 100%;">
-      <div id="map" aria-hidden="true" tabindex="-1" style="background-color: #ccc; height: 100%; margin-left: auto; margin-right: auto; position: absolute; width: 100%; z-index: 0;"></div>
-      <aside id="map-loader" class="hidden" style="display: none; height: 100%; max-width: 100%; width: 100%;">
-        <img src="assets/img/svg/map-loader.svg" height="100%" width="100%" style="display: block; max-width: 100%;">
+    <section id="map-container" aria-label="map" role="application">
+      <div id="map"  aria-hidden="true" tabindex="-1"></div>
+      <aside id="map-loader" class="hidden">
+        <img src="assets/img/svg/map-loader.svg" height="100%" width="100%">
       </aside>
     </section>
     
     
-    <section id="restaurant-container" aria-label="restaurant details" style="display: block; max-width: 100%;">
-      <figure style="display: block; margin: 0; max-width: 100%; padding: 0;">
-        <h2 id="restaurant-name" style="background: #252831; color: #f58400; font-family: 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold',sans-serif; font-size: 20pt; font-weight: 200; letter-spacing: 0; line-height: 1.1; margin: 0 auto; padding: 2%; text-align: left; text-shadow: 1px 1px #00000029; text-transform: uppercase; width: 96%;">
+    <section id="restaurant-container" aria-label="restaurant details">
+      <figure>
+        <h2 id="restaurant-name"></h1>
         <picture>
           <source id="restaurant-sourceWebp">
           <source id="restaurant-ndSourceWebp">
@@ -48,27 +48,27 @@
           <source id="restaurant-source">
           <source id="restaurant-ndSource">
           <source id="restaurant-thSource">
-          <img id="restaurant-img" style="border-top: 5px solid; display: block; max-width: 100%; width: 100%;">
+          <img id="restaurant-img">
         </picture>
-        <figcaption style="display: block; margin: 0; max-width: 100%; padding: 0;">
-          <p id="restaurant-cuisine" tabindex="1" aria-labelledby="foodType" style="background-color: #252831; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 12pt; font-weight: 300; letter-spacing: 10px; line-height: 1.5; margin: 0 0 20px; padding: 2px 0; padding-right: 5%; text-align: center; text-transform: uppercase; width: 100%;"></p>
+        <figcaption>
+          <p id="restaurant-cuisine" tabindex="1" aria-labelledby="foodType"></p>
         </figcaption>
-      </h2></figure>
-      <p id="restaurant-address" tabindex="2" style="color: #252831; font-family: 'Montserrat', sans-serif; font-size: 0.8em; line-height: 1.5; margin: 5% 0; padding-right: 5%; text-align: right;"></p>
-      <table id="restaurant-hours" role="table" tabindex="3" style="font: 0.8em 'Montserrat', sans-serif; margin: 5% auto 5% auto;"></table>
+      </figure>
+      <p id="restaurant-address" tabindex="2"></p>
+      <table id="restaurant-hours" role="table" tabindex="3"></table>
     </section>
     
     
-    <section id="reviews-container" aria-label="reviews from customers" style="background-color: white; display: block; max-width: 100%;">
-      <ul id="reviews-list" tabindex="4" role="list" style="background-color: #fff; color: #252831; font-family: Arial, Helvetica, sans-serif; font-size: 10pt; margin: 0; padding: 0;"></ul>
+    <section id="reviews-container" aria-label="reviews from customers">
+      <ul id="reviews-list" tabindex="4" role="list"></ul>
     </section>
   
   
   </main>
 
 
-  <footer id="footer" style="background-color: #252831; color: #dbdbdb; display: block; font-size: 0.5em; letter-spacing: 1px; max-width: 100%; padding: 1%; text-align: center; text-transform: uppercase;">
-    Copyright (c) 2017 <a href="index.html" style="color: orange; min-height: 48px; min-width: 48px; text-decoration: none;"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
+  <footer id="footer">
+    Copyright (c) 2017 <a href="index.html"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
   </footer>
   <!-- <script type="application/javascript" charset="utf-8" src="js/all.js"></script> -->
   <script type="application/javascript" src="js/dbhelper.js"></script>
