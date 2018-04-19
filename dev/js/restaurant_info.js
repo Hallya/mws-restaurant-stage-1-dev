@@ -63,28 +63,26 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   address.innerHTML = restaurant.address;
   address.setAttribute('aria-label', `located at ${restaurant.address}`);
   
-  // console.log(`webp: ${DBHelper.imageWebUrlForRestaurant(restaurant)}`);
-  console.log(restaurant);
-  const source = document.getElementById('restaurant-source');
+  
   const sourceWebp = document.getElementById('restaurant-sourceWebp');
-
   sourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-large_x1.webp 1x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-large_x2.webp 2x`;
   sourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-lazy.webp`;
   sourceWebp.media = '(min-width: 1000px)';
   sourceWebp.type = 'image/webp';
-  console.log(`jpg: ${DBHelper.imageUrlForRestaurant(restaurant)}`);
+  const source = document.getElementById('restaurant-source');
   source.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-large_x2.jpg 2x`;
   source.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
-  source.media = '(min-width: 1000px)';
+  source.media = sourceWebp.media;
   source.type = 'image/jpeg';
   
-  const ndSource = document.getElementById('restaurant-ndSource');
+
   const ndSourceWebp = document.getElementById('restaurant-ndSourceWebp');
   ndSourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-medium_x1.webp 1x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-medium_x2.webp 2x`;
   ndSourceWebp.media = '(min-width: 420px)';
   ndSourceWebp.type = 'image/webp';
+  const ndSource = document.getElementById('restaurant-ndSource');
   ndSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x2.jpg 2x`;
-  ndSource.media = '(min-width: 420px)';
+  ndSource.media = ndSourceWebp.media;
   ndSource.type = 'image/jpeg';
   
   const thSource = document.getElementById('restaurant-thSource');
@@ -93,7 +91,7 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   thSourceWebp.media = '(min-width: 320px)';
   thSourceWebp.type = 'image/webp';
   thSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-small_x2.jpg 2x, ${DBHelper.imageUrlForRestaurant(restaurant)}-small_x1.jpg 1x`;
-  thSource.media = '(min-width: 320px)';
+  thSource.media = thSourceWebp.media;
   thSource.type = 'image/jpeg';
   
   const image = document.getElementById('restaurant-img');

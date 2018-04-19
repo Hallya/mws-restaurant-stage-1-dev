@@ -88,10 +88,8 @@ if ('serviceWorker' in navigator) {
  * If options/filter menu is open and enter is pressed it makes focus skip to restaurants list.
  */
 document.onkeypress = function (e) {
-  console.log(e.code);
   if (e.charCode === 13 && filterOptions.classList.contains('optionsOpen')) {
     closeMenu();
-    console.log(sectionMap.clientHeight);
     listOfRestaurants.setAttribute('tabindex', '0');
     listOfRestaurants.focus();
     // window.scrollTo(0, sectionMap.clientHeight*2);
@@ -105,7 +103,6 @@ function activateLazyLoading() {
   var lazyImages = [].slice.call(document.querySelectorAll('.lazy'));
 
   if ('IntersectionObserver' in window) {
-    console.log('Starting intersectionObserver');
     let lazyImageObserver = new IntersectionObserver(function (entries, observer) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
@@ -129,7 +126,6 @@ function activateLazyLoading() {
     // Possibly fall back to a more compatible method here
     let lazyImages = [].slice.call(document.querySelectorAll('.lazy'));
     let active = false;
-    console.log('Starting adaptative lazy loading');
     const lazyLoad = function () {
       if (active === false) {
         active = true;
@@ -291,9 +287,6 @@ const fillRestaurantsHTML = (restaurants = self.restaurants) => {
     ul.append(createRestaurantHTML(restaurant));
   });
   addMarkersToMap();
-  console.log('Restaurants HTML filled');
-  // activateLazyLoading();
-  // setTimeout(() => switchLoaderToMap(), 5000);
 };
 
 /**

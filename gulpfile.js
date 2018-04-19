@@ -71,7 +71,7 @@ gulp.task('copy-html', () => {
     removeStyleTags: true
   }
   gulp.src(['dev/index.html'])
-    // .pipe(smoosher())
+    .pipe(smoosher())
     // .pipe(inlineCss(options))
     .pipe(gulp.dest('dist/'));
   gulp.src(['dev/restaurant.html'])

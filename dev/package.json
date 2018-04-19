@@ -22,9 +22,7 @@
     "css-loader": "^0.28.11",
     "gulp-inline-css": "^3.3.0",
     "gulp-inline-source": "^3.1.0",
-    "gulp-uncss": "^1.0.6"
-  },
-  "dependencies": {
+    "gulp-uncss": "^1.0.6",
     "browser-sync": "^2.23.6",
     "eslint": "^4.19.1",
     "gulp": "^3.9.1",
