@@ -1,0 +1,865 @@
+@charset "utf-8";
+@font-face {
+  font-family: "menusetting";
+  src: url('fonts/iconicfill.ttf');
+}
+@font-face {
+  font-family: "breadcrumb";
+  src: url('fonts/fontawesome.ttf');
+}
+
+/* latin */
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 500;
+  src: local('Montserrat Medium'), local('Montserrat-Medium'), url(fonts/JTURjIg1_i6t8kCHKm45_ZpC3gnD_vx3rCs.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* latin */
+
+@font-face {
+  font-family: 'Righteous';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Righteous'), local('Righteous-Regular'), url(fonts/1cXxaUPXBpj2rGoU7C9WiHGFq8Kk1Q.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+$screen-s-min: 320px;
+$screen-m-min: 550px;
+$screen-l-min: 1000px;
+$screen-xl-min: 2000px;
+$first-color: #ca0000;
+$second-color: #f58400;
+$background-primary-color: #fff;
+$background-secondary-color: #252831;
+
+@mixin m {
+  @media screen and (min-width: #{$screen-m-min}){
+    @content;
+  }
+}
+@mixin l {
+  @media screen and (min-width: #{$screen-l-min}){
+    @content;
+  }
+}
+@mixin xl {
+  @media screen and (min-width: #{$screen-xl-min}){
+    @content;
+  }
+}
+@mixin mobile {
+  @media screen and (min-width: #{$screen-s-min}) and (orientation: portrait) {
+    @content;
+  }
+}
+@mixin tablet {
+  @media screen and (min-width: #{$screen-m-min}) and (orientation: portrait) {
+    @content;
+  }
+}
+
+
+[class*="fontawesome-"]:before {
+  content: '\f061';
+  font-family: 'breadcrumb', sans-serif;
+  color: $background-primary-color;
+}
+.iconicfill-equalizer:before {
+  content: '\e052';
+  font-family: 'menusetting', sans-serif;
+  transition: 0.4s;
+}
+.iconicfill-x:before {
+  content: '\2717';
+  font-family: 'menusetting', sans-serif;
+}
+.iconicfill-arrow-down:before {
+  content: '\2193';
+  font-family: 'menusetting', sans-serif;
+}
+
+
+
+body, td, th, p {
+  color: $background-secondary-color;
+  line-height: 1.5;
+}
+
+body {
+  background-color: white;
+  margin: 0;
+  font-size: 16px;
+  width: 100%;
+  max-width: 100%;
+
+  @include m{
+    position: relative;
+    z-index: -1;
+  }
+
+  .moveDown {
+    @include m {
+      transform: translateY(7.5em);
+    }
+  }
+  .moveUp {
+    @include m {
+      transform: translateY(0em);
+    }
+  }
+}
+
+.wrapper {
+  position: relative;
+  z-index: 2;
+}
+
+main ul, li {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  color: $background-secondary-color;
+}
+
+figure, figcaption {
+  margin: 0;
+  padding: 0;
+}
+
+p {
+  text-align: right;
+  padding-right: 5%;
+  font-family: 'Montserrat', sans-serif;
+}
+
+a {
+  color: orange;
+  text-decoration: none;
+}
+
+a:hover,
+a:focus {
+  color: #3397db;
+  text-decoration: none;
+}
+
+a img {
+  border: none 0px  $background-primary-color;
+}
+
+a, button, select {
+  min-width: 48px;
+  min-height: 48px;
+}
+
+#map a, button, select {
+  min-width: 0;
+  min-height: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold',sans-serif;
+}
+
+article,
+aside,
+canvas,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section,
+img {
+  display: block;
+  max-width: 100%;
+}
+
+header {
+  height: 7em;
+
+  @include xl {
+    height: 8em;
+  }
+  #breadcrumb {
+    list-style: none;
+    background-color:$background-secondary-color;
+    height: 30%;
+    width: 100%;
+    @include xl {
+      font-size: 1.3em;
+    }
+    li {
+      display: inline;
+      color: $background-primary-color;
+      font-size: 1em;
+      font-family: 'Montserrat', sans-serif;
+      padding-right: 5px;
+      @include m {
+        font-size: 1.5em;
+      }
+      /* Add a color to all links the list */
+      a {
+        color: #f58301;
+        text-decoration: none;
+        /* Add a color on mouse-over */
+        a:hover {
+          color: #01447e;
+          text-decoration: underline;
+        }
+      }
+      /* Add a slash symbol (/) before/behind each list item */
+    }
+  }
+}
+
+main {
+  @include m {
+    width: 550px;
+    margin: 0 auto 0 auto;
+    transition: 0.4s ease-in-out;
+  }
+  @include l {
+    width: 900px;
+  }
+  @include xl {
+    width: 1900px;
+    display: flex;
+    justify-content: center;
+    flex-flow: wrap row;
+    align-items: center;
+  }
+  aside.popup {
+    display: none;
+    transition: 0.2s;
+    @include mobile {
+      
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #252831;
+      position: fixed;
+      width: 100vw;
+      height: 9em;
+      bottom: 0;
+      z-index: 10;
+      left: 0;
+      p {
+        color: $background-primary-color;
+        padding: 0 10%;
+        text-align: center;
+        margin: 0;
+      }
+      .note {
+        color: grey;
+      }
+      button {
+        position: absolute;
+        top: 2%;
+        right: 0%;
+        background-color: transparent;
+        border: transparent;
+        font-size: 1.5em;
+        color: #ca0000;
+
+      }
+      label {
+        display: none;
+      }
+      span {
+        position: absolute;
+        text-align: center;
+        color: $background-primary-color;
+        font-size: 1.7em;
+        line-height: 0;
+        width: 100%;
+        bottom: 10px;
+      }
+      img {
+        display: inline;
+        height: 1em;
+      }
+    }
+    @include tablet {
+      font-size: 1.5em;
+      span {
+        bottom: 15px;
+      }
+    }
+  }
+  aside.hide {
+    transform: translateY(9em);
+  }
+}
+
+#maincontent {
+  background-color: $background-primary-color;
+}
+
+#footer {
+  background-color: $background-secondary-color;
+  color: #dbdbdb;
+  padding: 1%;
+  font-size: 0.8em;
+  letter-spacing: 1px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ====================== Navigation ====================== */
+
+nav {
+  width: 100%;
+  height: 100%;
+  background-color: $background-secondary-color;
+  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @include m {
+    position: relative;
+    z-index: 1;
+  }
+  
+  h1 {
+    width: 80%;
+    margin-left: 5%;
+    text-align: left;
+    
+    a {
+      color:  $background-primary-color;
+      font-size: 1em;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+
+      @include m {
+        font-size: 1.3em;
+        background-color: $first-color;
+        border-radius: 25px;
+      }
+      @include xl {
+        font-size: 3em;
+      }
+    }
+  }
+  button {
+    min-width: 48px;
+    min-height: 48px;
+    margin-right: 0%;
+    color: $background-primary-color;
+    font-size: 2.5em;
+    background-color: $background-secondary-color;
+    border: 2px solid $background-secondary-color;
+    
+    @include l {
+      margin-right: 5%;
+    }
+    @include xl {
+      font-size: 3.5em;
+    }
+  }
+  .pressed {
+    color: rgb(255, 145, 0);
+  }
+  .iconicfill-x {
+    color: $background-primary-color;
+    font-size: 2em;
+    margin: 0% 65% 5% 0px;
+    padding: 0;
+  }
+}
+/* ====================== Restaurant Filtering ====================== */
+
+.filter-options {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-flow: wrap row;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 75vw;
+  overflow: hidden;
+  border-bottom: 3px solid #35b7ab;
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
+  background: linear-gradient(to right, #97fffb 10%, #00d2b5 100%);
+  transition: 0.4s ease-in-out;
+  
+  @include m {
+    height: 7em;
+    width: 100vw;
+    z-index: 0;
+  }
+  h3 {
+    color: $background-secondary-color;
+    font-weight: normal;
+    text-decoration: underline;
+    margin: 10% 0 5%;
+    width: 100%;
+    font-size: 1.7em;
+
+    @include m {
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+  }
+  
+  select {
+    background-color: $background-primary-color;
+    border: 1px solid  $background-primary-color;
+    font-family: Arial, sans-serif;
+    font-size: 11pt;
+    height: 35px;
+    letter-spacing: 0;
+    margin: 5px;
+    width: 150px;
+  }
+}
+
+.optionsOpen {
+  transform: translate3d(-1em, -7em, 0);
+  visibility: visible;
+
+  @include m {
+    transform: translateY(0em);
+  }
+}
+
+.optionsClose {
+  transform: translate3d(-16em, -7em, 0);
+  visibility: hidden;
+
+  @include m {
+    transform: translateY(-7.5em);
+  }
+}
+
+
+
+/* ====================== Map ====================== */
+
+#map-container {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  transition: 0.2s;
+  background-color: $background-secondary-color;
+  @include m {
+    height: 320px;
+    width: 550px;
+    margin: 2% auto;
+    border-radius: 25px;
+  }
+  @include xl {
+    width: 1200px;
+    height: 25em;
+    align-self: baseline;
+    margin: 7em 0 0 0;
+  }
+  #map {
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    position: absolute;
+    background-color: #ccc;
+    @include m {
+      border-radius: 25px;
+    }
+  }
+  #map-loader {
+    width: 100%;
+    height: 100%;
+  }
+  .hidden {
+    display: none;
+  }
+  .notHidden {
+    display: inherit;
+  }
+}
+
+
+
+
+/* ====================== Restaurant Listing ====================== */
+
+#restaurants-list {
+  background-color: $background-primary-color;
+  list-style: outside none none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  
+  @include l {
+    display: flex;
+    flex-flow: wrap row;
+    justify-content: center;
+  }
+  @include xl {
+    width: 100%;
+    margin: 1%;
+  }
+  li {
+    box-shadow: 0px 0px 80px -15px #000000d1;
+    border-radius: 25px;
+    font-family: Arial, sans-serif;
+    position: relative;
+    min-height: 380px;
+    padding: 0;
+    width: 92%;
+    margin: 5% auto;
+    text-align: center;
+    
+    @include l {
+      width: 45%;
+      margin: 2%;
+    }
+    @include xl {
+      width: 25%;
+    }
+    h2   {
+      text-align: left;
+      color: $first-color;
+      width: 95%;
+      height: 3em;
+      margin: 0 auto;
+      border-bottom: 1px dotted;
+      text-shadow: 1px 1px 1px #c56300;
+      font-family: 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+      font-size: 14pt;
+      font-weight: 200;
+      letter-spacing: 2px;
+      line-height: 3em;
+      text-transform: uppercase;
+    }
+    
+    .restaurant-img {
+      display: block;
+      margin: 0;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      border-top-right-radius: 25px;
+      border-top-left-radius: 25px;
+    }
+    aside {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 10;
+      text-align: center;
+      margin: 3% 3% 0 0;
+      background-color: #ffffff;
+      box-shadow: 0px 1px 29px -4px black;
+      border-radius: 50px;
+      height: 3em;
+      width: 3em;
+      line-height: 3em;
+
+      p {
+        color: #00d2b5;
+        font-family: 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        margin: 0;
+        line-height: 2.8em;
+        text-align: center;
+      }
+    }
+    p {
+      margin: 2% 0 0 0;
+      font-size: 11pt;
+    }
+    
+    a {
+      background-color: $first-color;
+      border-radius: 25px;
+      box-shadow: 0px 6px 2px -3px #8a8a8a;
+      color:  $background-primary-color;
+      display: inline-block;
+      font-size: 10pt;
+      margin: 4% 0;
+      width: 10em;
+      line-height: 48px;
+      text-align: center;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+  }
+}
+
+/* ====================== Restaurant Details ====================== */
+
+.inside {
+  header {
+    width: 100%;
+    background-color: $background-secondary-color;
+
+    @include l {
+      height: 8em;
+    }
+    @include xl {
+      height: 13em;
+    }
+  }
+  nav {
+    height: 65%;
+    background-color: $background-secondary-color;
+
+    h1 {
+      @include l {
+        font-size: 1.9em;
+      }
+    }
+  }
+#map-container {
+  height: 200px;
+
+  #map {
+    height: 100%;
+  }
+}
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+  #restaurant-container {
+    @include l {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-flow: column wrap;
+      align-content: center;
+      height: 30em;
+    }
+    @include xl {
+      width: 100%;
+      height: 60em;
+      order: 1;
+    }
+    h1,
+    h2 {
+      padding: 2%;
+      color: $first-color;
+      width: 90%;
+      margin: 0 auto;
+      text-align: left;
+      text-shadow: 1px 1px #00000029;
+    }
+    h2 {
+      @include xl {
+        padding: 1%;
+      }
+    }
+    figure {
+      @include l {
+        width: 55%;
+      }
+    }
+    #restaurant-name {
+      color: #f58400;
+      width: 96%;
+      background: $background-secondary-color;
+      font-size: 20pt;
+      font-weight: 200;
+      letter-spacing: 0;
+      margin: 0 auto;
+      text-transform: uppercase;
+      line-height: 1.1;
+  
+      @include m {
+        border-top-left-radius: 25px;
+        border-top-right-radius: 25px;
+      }
+      @include l {
+        width: 96%;
+      }
+      @include xl {
+        background: $background-primary-color;
+        font-size: 3em;
+        width: 100%;
+      }
+    }
+    #restaurant-img,
+    #restaurant-cuisine {
+      @include l {
+        width: 100%;
+        margin: 0 auto;
+      }
+    }
+    #restaurant-img {
+      width: 100%;
+      border-top: 5px solid;
+
+      @include xl {
+        width: 100%;
+      }
+    }
+    #restaurant-cuisine {
+      background-color: $background-secondary-color;
+      color: $background-primary-color;
+      font-size: 12pt;
+      font-weight: 300;
+      letter-spacing: 10px;
+      margin: 0 0 20px;
+      padding: 2px 0;
+      text-align: center;
+      text-transform: uppercase;
+      width: 100%;
+  
+      @include m {
+        border-bottom-left-radius: 25px;
+        border-bottom-right-radius: 25px;
+      }
+      @include xl {
+        background: $background-primary-color;
+        color: $background-secondary-color;
+        font-size: 1.5em;
+        width: 100%;
+      }
+    }
+    #restaurant-address,
+    #restaurant-hours {
+      @include l {
+        width: 51%;
+      }
+    }
+    #restaurant-address {
+      font-size: 0.8em;
+      margin: 5% 0;
+
+      @include l {
+        font-size: 1.5em;
+      }
+      @include xl {
+        font-size: 2em;
+        margin: 0;
+      }
+    }
+    #restaurant-hours {
+      margin: 5% auto 5% auto;
+      font: 0.8em 'Montserrat', sans-serif;
+      
+      @include xl {
+        font-size: 1.1em;
+      }
+      td {
+        color: #666;
+  
+        @include m {
+          font-size: 1.4em;
+        }
+      }
+    }
+    #restaurant-container,
+    #reviews-container {
+      border-bottom: 1px solid #d9d9d9;
+      border-top: 1px solid  $background-primary-color;
+      width: 100%;
+    }
+  }
+  #reviews-container {
+    background-color: white;
+    
+    @include xl {
+      width: 60%;
+      order: 2;
+    }
+    h3 {
+      color: $first-color;
+      font-size: 2em;
+      font-weight: 300;
+      text-align: center;
+      letter-spacing: -1px;
+      padding-bottom: 1pt;
+      padding: 0;
+      margin: 0;
+
+      @include xl {
+        font-size: 4em;
+        margin: 0;
+      }
+    }
+    
+    #reviews-list {
+      margin: 0;
+      padding: 0;
+      background-color:  $background-primary-color;
+      
+      @include xl {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+      }
+      li {
+        background-color:  $background-primary-color;
+        display: block;
+        list-style-type: none;
+        overflow: hidden;
+        margin: 2%;
+        padding: 4%;
+        box-shadow: 0 0 80px -30px black;
+        border-radius: 5%;
+        position: relative;
+        
+        @include xl {
+          width: 20%;
+          font-size: 1.2em;
+        }
+        p {
+          margin: 0 0 10px;
+          text-align: justify;
+        }
+        
+        .dateReview {
+          font-style: italic;
+        }
+        
+        .userName {
+          font: 1.2em 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        }
+        
+        .userRating {
+          font: 1em 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+          
+          .ratingStars {
+            color: $first-color;
+          }
+        }
+      }
+    }
+  }
+
+  #footer {
+    font-size: 0.5em;
+
+    @include l {
+      height: 4em;
+      padding: 1%;
+      font-size: 0.8em;
+      line-height: 4em;
+    }
+    @include xl {
+      font-size: 1em;
+      height: 2vh;
+      padding: 1%;
+      line-height: 2vh;
+    }
+  }
+}
