@@ -1,5 +1,6 @@
-/*eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
-const CACHE_STATIC = 'static-cache-2';
+import indexedb from './js/indexedb';
+const CACHE_STATIC = 'static-cache-1';
+const CACHE_MAP = 'cache-map-api-1';
 const URLS_TO_CACHE = [
   'index.html',
   'manifest.webmanifest',
@@ -8,7 +9,6 @@ const URLS_TO_CACHE = [
   'assets/css/fonts/fontawesome.ttf',
   'assets/css/fonts/1cXxaUPXBpj2rGoU7C9WiHGFq8Kk1Q.woff2',
   'assets/css/fonts/JTURjIg1_i6t8kCHKm45_ZpC3gnD_vx3rCs.woff2',
-  'assets/css/fonts/JTURjIg1_i6t8kCHKm45_ZpC3gTD_vx3rCubqg.woff2',
   'assets/img/png/launchScreen-ipad-9.7.png',
   'assets/img/png/launchScreen-ipadpro-10.5.png',
   'assets/img/png/launchScreen-ipadpro-12.9.png',
@@ -23,7 +23,8 @@ const URLS_TO_CACHE = [
   'assets/css/styles.css',
   'js/main.js',
   'js/restaurant_info.js',
-  'js/dbhelper.js'
+  'js/dbhelper.js',
+  'js/indexedb.js'
 ];
 
 self.addEventListener('install', event => {
@@ -54,53 +55,50 @@ self.addEventListener('activate', function (event) {
   );
 });
 
-self.addEventListener('fetch', event => {
+self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   let newPath;
   if (url.hostname.indexOf('maps') > -1) {
     event.respondWith(
-      caches.open(CACHE_STATIC).then(function (cache) {
-        return cache.match(event.request).then(res => {
-          if (url.href.indexOf('spotlight-poi2') > -1 && res) {
-            send_message_to_all_clients({ message: 'confirmed'});
-          }
-          return res || fetch(url.href, { mode: 'no-cors' }).then(response => {
-            if (url.href.indexOf('spotlight-poi2') > -1) {
-              send_message_to_all_clients({ message: 'confirmed' });
-              console.log('Message sent from SW to Client');
-            }
+      caches.open(CACHE_MAP).then((cache) => {
+        return cache.match(event.request).then((response) => {
+          // if (url.href.indexOf('spotlight-poi2') > -1 && response) {
+          //   send_message_to_all_clients({ message: 'confirmed'});
+          // }
+          return response || fetch(url.href, { mode: 'no-cors' }).then((response) => {
+            // if (url.href.indexOf('spotlight-poi2') > -1) {
+            //   send_message_to_all_clients({ message: 'confirmed' });
+            //   console.log('Message sent from SW to Client');
+            // }
             cache.put(event.request, response.clone());
             return response;
-          }, error => console.error(error));
+          }, (error) => console.error(error));
         });
       })
     );
   } else if (url.pathname.indexOf('restaurant.html') > -1) {
     newPath = url.href.replace(/[?&]id=\d/, '');
-    console.log(newPath);
     event.respondWith(
-      caches.open(CACHE_STATIC).then(cache => {
-        return cache.match(newPath).then(match => {
-          return match || fetch(event.request).then(response => {
+      caches.open(CACHE_STATIC).then((cache) => {
+        return cache.match(newPath).then((match) => {
+          return match || fetch(event.request).then((response) => {
             cache.put(newPath, response.clone());
-            console.log(newPath, 'cached');
             return response;
-          }, error => console.error(error));
+          }, (error) => console.error(error));
         });
       })
     );
-  } else if (url.pathname.indexOf('browser-sync') > -1) {
-    console.log('avoiding browser-sync');
-    event.respondWith(fetch(event.request).then(response => response));
+  } else if (url.pathname.indexOf('browser-sync') > -1 || url.pathname.endsWith('restaurants.json')) {
+    event.respondWith(fetch(event.request));
   } else {
     event.respondWith(
-      caches.open(CACHE_STATIC).then(cache => {
-        return cache.match(event.request).then(match => {
-          return match || fetch(event.request).then(response => {
+      caches.open(CACHE_STATIC).then((cache) => {
+        return cache.match(event.request).then((match) => {
+          return match || fetch(event.request).then((response) => {
             cache.put(event.request, response.clone());
             return response;
-          }, error => console.error(error));
-        });
+          }, (error) => console.error(error));
+        })
       })
     );
   }

@@ -1,4 +1,6 @@
 /* global DBHelper */
+import runtime from 'serviceworker-webpack-plugin/lib/runtime';
+
 let restaurants;
 let neighborhoods;
 let cuisines;
@@ -70,7 +72,7 @@ function closeMenu() {
  */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').then(registration => {
+    const registration = runtime.register().then(registration => {
       console.log('registration to serviceWorker complete with scope :', registration.scope);
     });
     navigator.serviceWorker.addEventListener('message', (event) => {
@@ -95,8 +97,6 @@ document.onkeypress = function (e) {
     // window.scrollTo(0, sectionMap.clientHeight*2);
   }
 };
-
-
 
 function activateLazyLoading() {
   
@@ -164,15 +164,14 @@ function activateLazyLoading() {
   }
 }
 
-
 /**
  * Fetch all neighborhoods and set their HTML.
  */
 const fetchNeighborhoods = () => {
   DBHelper.fetchNeighborhoods()
-    .then(neighborhoods => {
-      self.neighborhoods = neighborhoods;
-      fillNeighborhoodsHTML();
+  .then(neighborhoods => {
+    self.neighborhoods = neighborhoods;
+    fillNeighborhoodsHTML();
     })
     .catch(error => console.error(error));
 };
@@ -197,9 +196,9 @@ const fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
  */
 const fetchCuisines = () => {
   DBHelper.fetchCuisines()
-    .then(cuisines => {
-      self.cuisines = cuisines;
-      fillCuisinesHTML();
+  .then(cuisines => {
+    self.cuisines = cuisines;
+    fillCuisinesHTML();
     })
     .catch(error => console.error(error));
 };

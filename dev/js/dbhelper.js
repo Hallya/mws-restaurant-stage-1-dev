@@ -1,3 +1,5 @@
+/*global idbKey */
+
 class DBHelper {
 
   static get DATABASE_URL() {
@@ -20,10 +22,22 @@ class DBHelper {
    */
   static fetchRestaurantById(id) {
     // fetch all restaurants with proper error handling.
-    return fetch(DBHelper.DATABASE_URL)
-      .then(response => response.json())
-      .then(data => data.restaurants[id - 1])
-      .catch(error => console.error(`Restaurant does not exist: ${error}`));
+    const store = 'restaurants';
+    return idbKey.get(store, Number(id))
+      .then((restaurant) => {
+        if (!restaurant) {
+          return fetch(DBHelper.DATABASE_URL)
+            .then(response => response.json())
+            .then(data => {
+              const restaurant = data.restaurants[id - 1];
+              idbKey.set(store, restaurant);
+              return restaurant;
+            })
+            .catch(error => console.error(`Restaurant does not exist: ${error}`));
+        } else {
+          return restaurant;
+        }
+      })
   }
 
   /**
@@ -51,20 +65,32 @@ class DBHelper {
    */
   static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood) {
     // Fetch all restaurants
-    return DBHelper.fetchRestaurants()
-      .then(restaurants => {
-        let results = restaurants.restaurants;
-        if (cuisine !== 'all') {
-          results = restaurants.restaurants.filter(r => r.cuisine_type == cuisine);
+    const store = 'restaurants';
+    return idbKey.getAll(store)
+      .then((cachedResults) => {
+        if (cachedResults.length === 0) {
+          return DBHelper.fetchRestaurants()
+            .then(restaurants => {
+              const results = restaurants.restaurants;
+              results.forEach((restaurant) => idbKey.set(store, restaurant));
+              return DBHelper.filterResults(results, cuisine, neighborhood);
+            })
+            .catch(error => console.error(error));
+        } else {
+          return DBHelper.filterResults(cachedResults, cuisine, neighborhood);
         }
-        if (neighborhood !== 'all') {
-          results = restaurants.restaurants.filter(r => r.neighborhood == neighborhood);
-        }
-        return results;
-      })
-      .catch(error => console.error(error));
+      }).catch((error) => console.error(error));
   }
 
+  static filterResults(results, cuisine, neighborhood) {
+    if (cuisine !== 'all') {
+      results = results.filter(restaurant => restaurant.cuisine_type == cuisine);
+    }
+    if (neighborhood !== 'all') {
+      results = results.filter(restaurant => restaurant.neighborhood == neighborhood);
+    }
+    return results;
+  }
   /**
    * Fetch all neighborhoods with proper error handling.
    */
@@ -151,3 +177,5 @@ class DBHelper {
     });
   }
 }
+
+window.DBHelper = DBHelper;

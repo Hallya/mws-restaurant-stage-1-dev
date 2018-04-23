@@ -4,13 +4,10 @@ const gulp = require('gulp');
 const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const browserSync = require('browser-sync').create();
-// const eslint = require('gulp-eslint');
-// const concat = require  ('gulp-concat');
 const uglify = require('gulp-uglify');
 const gutil = require('gulp-util');
 const babel = require('gulp-babel');
 const sourcemaps = require('gulp-sourcemaps');
-// const jasmine = require('gulp-jasmine-phantom');
 const responsive = require('gulp-responsive');
 const imagemin = require('gulp-imagemin');
 const webp = require('gulp-webp');
@@ -18,7 +15,6 @@ const inlineCss = require('gulp-inline-css');
 const inlinesource = require('gulp-inline-source');
 const smoosher = require('gulp-smoosher');
 const uncss = require('gulp-uncss');
-// const pngquant = require('imagemin-pngquant');
 
 gulp.task('default', ['styles', 'copy-html', 'scripts', 'copy-manifest'],() => {
   gulp.watch('*/**/*.scss', ['styles']).on('change', browserSync.reload);
@@ -38,17 +34,21 @@ gulp.task('dist', ['styles', 'copy-html', 'scripts-dist', 'copy-data', 'copy-man
 gulp.task('scripts', () => {
   gulp.src('dev/js/**/*.js')
     .pipe(sourcemaps.init())
-    .pipe(babel({ presets: ['es2015'] }))
+    .pipe(babel({
+      presets: ['@babel/env']
+    }))
     .pipe(sourcemaps.write())
     .pipe(gulp.dest('dist/js'));
   gulp.src('dev/sw.js')
     .pipe(gulp.dest('dist'));
+  gulp.src('dev/node_modules/idb/lib/idb.js')
+    .pipe(gulp.dest('dist/js'));
   });
   
   gulp.task('scripts-dist', () => {
     gulp.src('dev/js/**/*.js')
       .pipe(sourcemaps.init())
-      .pipe(babel({ presets: ['es2015'] }))
+      .pipe(babel({ presets: ['env'] }))
       .pipe(sourcemaps.write())
       .pipe(uglify())
       .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
