@@ -41,13 +41,15 @@ gulp.task('scripts', () => {
         ['uglifyify', { global: true, sourceMap: false }]
       ]
     }))  
-    // .pipe(sourcemaps.init())
-    // .pipe(babel({
-    //   presets: ['@babel/env']
-    // }))
     .pipe(uglify())
     .pipe(gulp.dest('dist/js'));
   gulp.src('dev/sw.js')
+    .pipe(browserify({
+      transform: [
+        babelify.configure({ presets: ['es2015'] }),
+        ['uglifyify', { global: true, sourceMap: false }]
+      ]
+    })) 
     .pipe(gulp.dest('dist'));
   // gulp.src('dev/node_modules/idb/lib/idb.js')
   //   .pipe(gulp.dest('dist/js'));

@@ -1,11 +1,11 @@
-const CACHE_STATIC = 'static-cache-10';
-const CACHE_MAP = 'cache-map-api-10';
+const CACHE_STATIC = 'static-cache-1';
+const CACHE_MAP = 'cache-map-api-1';
 const URLS_TO_CACHE = [
   'index.html',
   'manifest.webmanifest',
   'restaurant.html',
-  'assets/css/fonts/iconicfill.ttf',
-  'assets/css/fonts/fontawesome.ttf',
+  'assets/css/fonts/iconicfill.woff2',
+  'assets/css/fonts/fontawesome.woff2',
   'assets/css/fonts/1cXxaUPXBpj2rGoU7C9WiHGFq8Kk1Q.woff2',
   'assets/css/fonts/JTURjIg1_i6t8kCHKm45_ZpC3gnD_vx3rCs.woff2',
   'assets/img/png/launchScreen-ipad-9.7.png',
