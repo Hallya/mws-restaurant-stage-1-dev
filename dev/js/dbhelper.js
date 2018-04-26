@@ -1,5 +1,5 @@
 /*global idbKey */
-
+import idbKey from './indexedb';
 class DBHelper {
 
   static get DATABASE_URL() {
@@ -68,7 +68,7 @@ class DBHelper {
     const store = 'restaurants';
     return idbKey.getAll(store)
       .then((cachedResults) => {
-        if (cachedResults.length === 0) {
+        if (cachedResults.length < 10) {
           return DBHelper.fetchRestaurants()
             .then(restaurants => {
               const results = restaurants.restaurants;
@@ -177,5 +177,5 @@ class DBHelper {
     });
   }
 }
-
-window.DBHelper = DBHelper;
+export default DBHelper;
+// window.DBHelper = DBHelper;

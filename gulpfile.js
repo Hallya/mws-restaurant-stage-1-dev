@@ -1,6 +1,8 @@
 /* eslint-env node */
 
 const gulp = require('gulp');
+const browserify = require('gulp-bro');
+const babelify = require('babelify');
 const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const browserSync = require('browser-sync').create();
@@ -32,34 +34,40 @@ gulp.task('default', ['styles', 'copy-html', 'scripts', 'copy-manifest'],() => {
 gulp.task('dist', ['styles', 'copy-html', 'scripts-dist', 'copy-data', 'copy-manifest']);
 
 gulp.task('scripts', () => {
-  gulp.src('dev/js/**/*.js')
-    .pipe(sourcemaps.init())
-    .pipe(babel({
-      presets: ['@babel/env']
-    }))
-    .pipe(sourcemaps.write())
+  gulp.src(['dev/js/main.js', 'dev/js/restaurant_info.js'])
+    .pipe(browserify({
+      transform: [
+        babelify.configure({ presets: ['es2015'] }),
+        ['uglifyify', { global: true, sourceMap: false }]
+      ]
+    }))  
+    // .pipe(sourcemaps.init())
+    // .pipe(babel({
+    //   presets: ['@babel/env']
+    // }))
+    .pipe(uglify())
     .pipe(gulp.dest('dist/js'));
   gulp.src('dev/sw.js')
     .pipe(gulp.dest('dist'));
-  gulp.src('dev/node_modules/idb/lib/idb.js')
-    .pipe(gulp.dest('dist/js'));
+  // gulp.src('dev/node_modules/idb/lib/idb.js')
+  //   .pipe(gulp.dest('dist/js'));
   });
   
   gulp.task('scripts-dist', () => {
     gulp.src('dev/js/**/*.js')
       .pipe(sourcemaps.init())
-      .pipe(babel({ presets: ['env'] }))
+      .pipe(babel({ presets: ['@babel/env'] }))
       .pipe(sourcemaps.write())
       .pipe(uglify())
       .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
       .pipe(gulp.dest('dist/js'));
     gulp.src('dev/sw.js')
       .pipe(sourcemaps.init())
-      .pipe(babel({ presets: ['es2015'] }))
+      .pipe(babel({ presets: ['@babel/env'] }))
       .pipe(sourcemaps.write())
       .pipe(uglify())
       .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })  
-    .pipe(gulp.dest('dist'));
+      .pipe(gulp.dest('dist'));
 });
 
 gulp.task('copy-html', () => {
@@ -154,7 +162,7 @@ gulp.task('styles', () => {
     .pipe(gulp.dest('dist/assets/css'))
     .pipe(browserSync.stream());
   gulp.src('dev/assets/css/fonts/*')
-    .pipe(gulp.dest('dist/assets/css/fonts'));
+    .pipe(gulp.dest('dist/assets/css/fonts/'));
 });
 
 // gulp.task('lint', () => {

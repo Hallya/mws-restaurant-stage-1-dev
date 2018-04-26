@@ -1,5 +1,5 @@
 /* global DBHelper */
-import runtime from 'serviceworker-webpack-plugin/lib/runtime';
+import DBHelper from './dbhelper';
 
 let restaurants;
 let neighborhoods;
@@ -72,7 +72,7 @@ function closeMenu() {
  */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    const registration = runtime.register().then(registration => {
+    navigator.serviceWorker.register('../sw.js').then(registration => {
       console.log('registration to serviceWorker complete with scope :', registration.scope);
     });
     navigator.serviceWorker.addEventListener('message', (event) => {
@@ -233,10 +233,10 @@ window.initMap = () => {
     center: loc,
     scrollwheel: false
   });
-
-  self.map.addListener('idle', () => {
-    DBHelper.switchLoaderToMap();
-  });
+  
+  // self.map.addListener('idle', () => {
+  //   DBHelper.switchLoaderToMap();
+  // });
   updateRestaurants();
 };
 
@@ -271,8 +271,9 @@ const resetRestaurants = (restaurants) => {
   ul.innerHTML = '';
 
   // Remove all map markers
-
-  self.markers.forEach(m => m.setMap(null));
+  if (markers.length > 0) {
+    self.markers.forEach(m => m.setMap(null));
+  }
   self.markers = [];
   self.restaurants = restaurants;
 };

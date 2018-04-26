@@ -1,6 +1,5 @@
-import indexedb from './js/indexedb';
-const CACHE_STATIC = 'static-cache-1';
-const CACHE_MAP = 'cache-map-api-1';
+const CACHE_STATIC = 'static-cache-10';
+const CACHE_MAP = 'cache-map-api-10';
 const URLS_TO_CACHE = [
   'index.html',
   'manifest.webmanifest',
@@ -23,8 +22,6 @@ const URLS_TO_CACHE = [
   'assets/css/styles.css',
   'js/main.js',
   'js/restaurant_info.js',
-  'js/dbhelper.js',
-  'js/indexedb.js'
 ];
 
 self.addEventListener('install', event => {
@@ -90,10 +87,13 @@ self.addEventListener('fetch', (event) => {
     );
   } else if (url.pathname.indexOf('browser-sync') > -1 || url.pathname.endsWith('restaurants.json')) {
     event.respondWith(fetch(event.request));
+  } else if (url.pathname.indexOf('assets/img') > -1 || url.pathname.endsWith('restaurants.json')) {
+    event.respondWith(fetch(event.request));
   } else {
     event.respondWith(
       caches.open(CACHE_STATIC).then((cache) => {
         return cache.match(event.request).then((match) => {
+
           return match || fetch(event.request).then((response) => {
             cache.put(event.request, response.clone());
             return response;

@@ -1,3 +1,4 @@
+import idb from '../node_modules/idb/lib/idb';
 const openDatabase = () => {
   if (!navigator.serviceWorker) {
     return;
