@@ -1,5 +1,5 @@
-const CACHE_STATIC = 'static-cache-1';
-const CACHE_MAP = 'cache-map-api-1';
+const CACHE_STATIC = 'static-cache-2';
+const CACHE_MAP = 'cache-map-api-2';
 const URLS_TO_CACHE = [
   'index.html',
   'manifest.webmanifest',
