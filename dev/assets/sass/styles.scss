@@ -696,6 +696,13 @@ nav {
         width: 100%;
       }
     }
+    img,
+    source {
+      width: 100%;
+      @include l {
+        margin: 0 auto;
+      }
+    }
     #restaurant-img,
     #restaurant-cuisine {
       @include l {
@@ -706,10 +713,6 @@ nav {
     #restaurant-img {
       width: 100%;
       border-top: 5px solid;
-
-      @include xl {
-        width: 100%;
-      }
     }
     #restaurant-cuisine {
       background-color: $background-secondary-color;

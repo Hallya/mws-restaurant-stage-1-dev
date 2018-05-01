@@ -4,12 +4,13 @@ const openDatabase = () => {
     return;
   }
 
-  return idb.open('restaurant-reviews', 1, function (upgradeDb) {
+  const request = idb.open('restaurant-reviews', 1, function (upgradeDb) {
     switch (upgradeDb.oldVersion) {
       case 0:
         upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
     }
-  });
+  })
+  return request;
 };
 
 const idbKey = {
@@ -38,21 +39,6 @@ const idbKey = {
         return;
       }
       return db.transaction(store).objectStore(store).getAll();
-
-      // const restaurants = [];
-      // const store = tx.objectStore('restaurants');
-      // (store.iterateKeyCursor || store.iterateCursor)
-      //   .call(store, (cursor) => {
-      //     if (!cursor) {
-      //       console.log('finito..');
-      //       return;
-      //     }
-      //     console.log('pushing something..');
-      //     restaurants.push(cursor.key);
-      //     cursor.continue();
-      //   });
-      // console.log(`restaurants: ${restaurants}`);
-      // return tx.complete.then(() => restaurants);
     }).catch(error => console.error(error));
   }
 };

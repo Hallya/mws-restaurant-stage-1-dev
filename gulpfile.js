@@ -2,6 +2,7 @@
 
 const gulp = require('gulp');
 const browserify = require('gulp-bro');
+const htmlmin = require('gulp-htmlmin');
 const babelify = require('babelify');
 const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
@@ -13,16 +14,12 @@ const sourcemaps = require('gulp-sourcemaps');
 const responsive = require('gulp-responsive');
 const imagemin = require('gulp-imagemin');
 const webp = require('gulp-webp');
-const inlineCss = require('gulp-inline-css');
-const inlinesource = require('gulp-inline-source');
 const smoosher = require('gulp-smoosher');
-const uncss = require('gulp-uncss');
 
-gulp.task('default', ['styles', 'copy-html', 'scripts', 'copy-manifest'],() => {
+gulp.task('default', ['styles', 'copy-html', 'scripts-dist', 'copy-manifest'],() => {
   gulp.watch('*/**/*.scss', ['styles']).on('change', browserSync.reload);
-  // gulp.watch('js/**/*.js', ['lint']);
   gulp.watch(['dev/*.html'], ['copy-html']);
-  gulp.watch(['dev/js/**/*.js', 'dev/sw.js'], ['scripts']).on('change', browserSync.reload);
+  gulp.watch(['dev/js/**/*.js', 'dev/sw.js'], ['scripts-dist']).on('change', browserSync.reload);
   gulp.watch('dev/manifest.json', ['copy-manifest']).on('change', browserSync.reload);
   gulp.watch([
     'dist/index.html',
@@ -37,55 +34,47 @@ gulp.task('scripts', () => {
   gulp.src(['dev/js/main.js', 'dev/js/restaurant_info.js'])
     .pipe(browserify({
       transform: [
-        babelify.configure({ presets: ['es2015'] }),
-        ['uglifyify', { global: true, sourceMap: false }]
+        babelify.configure({ presets: ['es2015'] })
       ]
-    }))  
-    .pipe(uglify())
+    }))
     .pipe(gulp.dest('dist/js'));
   gulp.src('dev/sw.js')
     .pipe(browserify({
       transform: [
-        babelify.configure({ presets: ['es2015'] }),
-        ['uglifyify', { global: true, sourceMap: false }]
+        babelify.configure({ presets: ['es2015'] })
       ]
     })) 
     .pipe(gulp.dest('dist'));
-  // gulp.src('dev/node_modules/idb/lib/idb.js')
-  //   .pipe(gulp.dest('dist/js'));
   });
   
   gulp.task('scripts-dist', () => {
-    gulp.src('dev/js/**/*.js')
-      .pipe(sourcemaps.init())
-      .pipe(babel({ presets: ['@babel/env'] }))
-      .pipe(sourcemaps.write())
+    gulp.src(['dev/js/main.js', 'dev/js/restaurant_info.js'])
+      .pipe(browserify({
+        transform: [
+          babelify.configure({ presets: ['es2015'] }),
+          ['uglifyify', { global: true, sourceMap: false }]
+        ]
+      }))
       .pipe(uglify())
-      .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
       .pipe(gulp.dest('dist/js'));
     gulp.src('dev/sw.js')
-      .pipe(sourcemaps.init())
-      .pipe(babel({ presets: ['@babel/env'] }))
-      .pipe(sourcemaps.write())
-      .pipe(uglify())
-      .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })  
+      .pipe(browserify({
+        transform: [
+          babelify.configure({ presets: ['es2015'] }),
+          ['uglifyify', { global: true, sourceMap: false }]
+        ]
+      }))
       .pipe(gulp.dest('dist'));
 });
 
 gulp.task('copy-html', () => {
-  const options = {
-    applyStyleTags: true,
-    applyLinkTags: true,
-    removeStyleTags: false,
-    removeLinkTags: false,
-    removeStyleTags: true
-  }
   gulp.src(['dev/index.html'])
     .pipe(smoosher())
-    // .pipe(inlineCss(options))
+    .pipe(htmlmin({collapseWhitespace: true}))
     .pipe(gulp.dest('dist/'));
-  gulp.src(['dev/restaurant.html'])
+    gulp.src(['dev/restaurant.html'])
     .pipe(smoosher())
+    .pipe(htmlmin({ collapseWhitespace: true}))
     .pipe(gulp.dest('dist/'));
 });
 
@@ -108,22 +97,22 @@ gulp.task('copy-images', () => {
           suffix: '-lazy',
         },
       }, {
-        width: 400,
+        width: 300,
         rename: {
           suffix: '-small_x1',
         },
       }, {
-        width: 500,
+        width: 400,
         rename: {
           suffix: '-small_x2',
         },
       }, {
-        width: 600,
+        width: 500,
         rename: {
           suffix: '-medium_x1',
         },
       }, {
-        width: 700,
+        width: 600,
         rename: {
           suffix: '-medium_x2',
         },
@@ -166,18 +155,3 @@ gulp.task('styles', () => {
   gulp.src('dev/assets/css/fonts/*')
     .pipe(gulp.dest('dist/assets/css/fonts/'));
 });
-
-// gulp.task('lint', () => {
-// 	return gulp.src(['js/**/*.js', '!node_modules/**'])
-// 		.pipe(eslint())
-// 		.pipe(eslint.format())
-// 		.pipe(eslint.failAfterError());
-// });
-
-// gulp.task('tests', () => {
-// 	gulp.src('tests/spec/extraSpec.js')
-// 		.pipe(jasmine({
-// 			integration: true,
-// 			vendor: 'js/**/*.js'
-// 		}));
-// });

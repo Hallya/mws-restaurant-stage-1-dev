@@ -3,8 +3,7 @@ import idbKey from './indexedb';
 class DBHelper {
 
   static get DATABASE_URL() {
-    // const path = window.location.hostname === 'hallya.github.io' ? 'data/restaurants.json' : 'http://localhost:1337/restaurants';
-    const path = 'data/restaurants.json';
+    const path = window.navigator.standalone ? 'data/restaurants.json' : 'http://localhost:1337/restaurants';
     return path;
   }
 
@@ -14,6 +13,7 @@ class DBHelper {
   static fetchRestaurants() {
     return fetch(DBHelper.DATABASE_URL)
       .then(response => response.json())
+      .then(data => window.navigator.standalone ? data.restaurants : data)
       .catch(error => console.error(`Request failed. Returned status of ${error}`));
   }
 
@@ -26,10 +26,11 @@ class DBHelper {
     return idbKey.get(store, Number(id))
       .then((restaurant) => {
         if (!restaurant) {
+          console.log('No cache found');
           return fetch(DBHelper.DATABASE_URL)
             .then(response => response.json())
             .then(data => {
-              const restaurant = data.restaurants[id - 1];
+              const restaurant = data[id - 1];
               idbKey.set(store, restaurant);
               return restaurant;
             })
@@ -71,7 +72,7 @@ class DBHelper {
         if (cachedResults.length < 10) {
           return DBHelper.fetchRestaurants()
             .then(restaurants => {
-              const results = restaurants.restaurants;
+              const results = restaurants;
               results.forEach((restaurant) => idbKey.set(store, restaurant));
               return DBHelper.filterResults(results, cuisine, neighborhood);
             })
@@ -99,7 +100,7 @@ class DBHelper {
     return DBHelper.fetchRestaurants()
       .then(restaurants => {
         // Get all neighborhoods from all restaurants
-        const neighborhoods = restaurants.restaurants.map(restaurant => restaurant.neighborhood);
+        const neighborhoods = restaurants.map(restaurant => restaurant.neighborhood);
         // Remove duplicates from neighborhoods
         const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i);
         return uniqueNeighborhoods;
@@ -115,7 +116,7 @@ class DBHelper {
     return DBHelper.fetchRestaurants()
       .then(restaurants => {
         // Get all cuisines from all restaurants
-        const cuisines = restaurants.restaurants.map(restaurant => restaurant.cuisine_type);
+        const cuisines = restaurants.map(restaurant => restaurant.cuisine_type);
         // Remove duplicates from cuisines
         const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i);
         return uniqueCuisines;
@@ -154,28 +155,27 @@ class DBHelper {
     return marker;
   }
 
-  static switchLoaderToMap() {
-    if (document.getElementById('map').classList.contains('hidden')) {
-      document.getElementById('map').classList.remove('hidden');
-      document.getElementById('map-loader').classList.add('hidden');
-    }
-    return;
-  }
+  // static switchLoaderToMap() {
+  //   if (document.getElementById('map').classList.contains('hidden')) {
+  //     document.getElementById('map').classList.remove('hidden');
+  //     document.getElementById('map-loader').classList.add('hidden');
+  //   }
+  //   return;
+  // }
 
-  static sendMessage(message) {
-    return new Promise(function (resolve, reject) {
-      var messageChannel = new MessageChannel();
-      messageChannel.port1.onmessage = function (event) {
-        if (event.data.error) {
-          reject(event.data.error);
-        } else {
-          resolve(event.data);
-        }
-      };
-      navigator.serviceWorker.controller.postMessage(message,
-        [messageChannel.port2]);
-    });
-  }
+  // static sendMessage(message) {
+  //   return new Promise(function (resolve, reject) {
+  //     var messageChannel = new MessageChannel();
+  //     messageChannel.port1.onmessage = function (event) {
+  //       if (event.data.error) {
+  //         reject(event.data.error);
+  //       } else {
+  //         resolve(event.data);
+  //       }
+  //     };
+  //     navigator.serviceWorker.controller.postMessage(message,
+  //       [messageChannel.port2]);
+  //   });
+  // }
 }
 export default DBHelper;
-// window.DBHelper = DBHelper;

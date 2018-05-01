@@ -1,5 +1,6 @@
 /* global DBHelper */
 import DBHelper from './dbhelper';
+import LazyLoading from './helpers';
 
 let restaurants;
 let neighborhoods;
@@ -23,11 +24,17 @@ const mainContent = document.querySelector('main'),
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', () => {
-  if (!window.navigator.standalone && window.navigator.userAgent.indexOf('AppleWebKit') > -1) {
-    addToHomeScreen();
+  if (
+    !window.navigator.standalone
+    && (window.navigator.userAgent.indexOf('Android') === -1
+      && window.navigator.userAgent.indexOf('Linux') === -1)
+  ) {
+    addBannerToHomeScreen();
   }
   fetchNeighborhoods();
   fetchCuisines();
+  updateRestaurants()
+    .then(LazyLoading)  ;
 });
 
 
@@ -54,7 +61,6 @@ function openMenu() {
   filterResultHeading.setAttribute('tabindex', '-1');
   filterResultHeading.focus();
 }
-
 function closeMenu() {
   filterOptions.classList.remove('optionsOpen');
   filterOptions.classList.add('optionsClose');
@@ -67,27 +73,20 @@ function closeMenu() {
   filterResultHeading.removeAttribute('tabindex');
 }
 
+
 /**
  * Register to service worker if the browser is compatible.
  */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('../sw.js').then(registration => {
-      console.log('registration to serviceWorker complete with scope :', registration.scope);
-    });
-    navigator.serviceWorker.addEventListener('message', (event) => {
-      if (event.data.message === 'confirmed') {
-        DBHelper.switchLoaderToMap();
-        console.log('Switch done');
-      }
-    });
-    activateLazyLoading();
+    const pathToServiceWorker = window.location.hostname === 'hallya.github.io' ? '/mws-restaurant-stage-1/sw.js' : '../sw.js'
+    navigator.serviceWorker.register(pathToServiceWorker).then(registration => console.log('registration to serviceWorker complete with scope :', registration.scope));
   });
 }
 
 
 /**
- * If options/filter menu is open and enter is pressed it makes focus skip to restaurants list.
+ * If select/filter menu is open, press enter will make the restaurants list focus.
  */
 document.onkeypress = function (e) {
   if (e.charCode === 13 && filterOptions.classList.contains('optionsOpen')) {
@@ -97,72 +96,6 @@ document.onkeypress = function (e) {
     // window.scrollTo(0, sectionMap.clientHeight*2);
   }
 };
-
-function activateLazyLoading() {
-  
-  var lazyImages = [].slice.call(document.querySelectorAll('.lazy'));
-
-  if ('IntersectionObserver' in window) {
-    let lazyImageObserver = new IntersectionObserver(function (entries, observer) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          let lazyImage = entry.target;
-          if (lazyImage.localName === 'source') {
-            lazyImage.srcset = lazyImage.dataset.srcset;
-          } else {
-            lazyImage.src = lazyImage.dataset.src;
-          }
-
-          lazyImage.classList.remove('lazy');
-          lazyImageObserver.unobserve(lazyImage);
-        }
-      });
-    });
-
-    lazyImages.forEach(function (lazyImage) {
-      lazyImageObserver.observe(lazyImage);
-    });
-  } else {
-    // Possibly fall back to a more compatible method here
-    let lazyImages = [].slice.call(document.querySelectorAll('.lazy'));
-    let active = false;
-    const lazyLoad = function () {
-      if (active === false) {
-        active = true;
-
-        setTimeout(function () {
-          lazyImages.forEach(function (lazyImage) {
-            if ((lazyImage.getBoundingClientRect().top <= (window.innerHeight + 50)
-              && lazyImage.getBoundingClientRect().bottom >= 0)
-              && getComputedStyle(lazyImage).display !== 'none') {
-              lazyImage.src = lazyImage.dataset.src;
-              lazyImage.srcset = lazyImage.dataset.srcset;
-              lazyImage.classList.remove('lazy');
-
-              lazyImages = lazyImages.filter(function (image) {
-                return image !== lazyImage;
-              });
-
-              if (lazyImages.length === 0) {
-                document.removeEventListener('scroll', lazyLoad);
-                window.removeEventListener('resize', lazyLoad);
-                window.removeEventListener('orientationchange', lazyLoad);
-              }
-            }
-          });
-
-          active = false;
-        }, 200);
-      }
-    };
-    document.addEventListener('scroll', lazyLoad);
-    window.addEventListener('resize', lazyLoad);
-    window.addEventListener('orientationchange', lazyLoad);
-    if (window.document.readyState === 'complete') { 
-      lazyLoad();
-    }
-  }
-}
 
 /**
  * Fetch all neighborhoods and set their HTML.
@@ -223,7 +156,6 @@ const fillCuisinesHTML = (cuisines = self.cuisines) => {
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
-
   let loc = {
     lat: 40.722216,
     lng: -73.987501
@@ -233,11 +165,10 @@ window.initMap = () => {
     center: loc,
     scrollwheel: false
   });
-  
-  // self.map.addListener('idle', () => {
-  //   DBHelper.switchLoaderToMap();
-  // });
-  updateRestaurants();
+  updateRestaurants()
+    .then(LazyLoading)
+    .then(addMarkersToMap)
+    .catch(error => console.error(error));
 };
 
 /**
@@ -253,12 +184,10 @@ const updateRestaurants = () => {
   const cuisine = cSelect[cIndex].value;
   const neighborhood = nSelect[nIndex].value;
 
-  DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
-    .then(restaurants => {
-      resetRestaurants(restaurants);
-      fillRestaurantsHTML();
-      activateLazyLoading();
-    }).catch(error => console.error(error));
+  return DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
+    .then(resetRestaurants)
+    .then(fillRestaurantsHTML)
+    .catch(error => console.error(error));
 };
 
 /**
@@ -286,7 +215,6 @@ const fillRestaurantsHTML = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
   });
-  addMarkersToMap();
 };
 
 /**
@@ -393,6 +321,7 @@ const createRestaurantHTML = (restaurant) => {
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
   more.setAttribute('aria-label', `View details of ${restaurant.name}`);
+  more.setAttribute('rel', 'noopener');
   li.append(more);
 
   li.setAttribute('role', 'listitem');
@@ -416,7 +345,10 @@ const addMarkersToMap = (restaurants = self.restaurants) => {
 };
 
 
-const addToHomeScreen = () => {
+/**
+ * Create a banner to notified the possibility to add the page as an app.
+ */
+const addBannerToHomeScreen = () => {
   const aside = document.createElement('aside');
   const note = document.createElement('p');
   const msg = document.createElement('p');

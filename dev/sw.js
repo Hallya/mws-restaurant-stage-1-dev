@@ -1,4 +1,4 @@
-const CACHE_STATIC = 'static-cache-2';
+const CACHE_STATIC = 'static-cache-7';
 const CACHE_MAP = 'cache-map-api-2';
 const URLS_TO_CACHE = [
   'index.html',
@@ -41,14 +41,9 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(keys => Promise.all(
-      keys.map(key => {
-        if (key !== CACHE_STATIC) {
-          return caches.delete(key);
-        }
-      })
-    )).then(() => {
-      console.log(`${CACHE_STATIC} now ready to handle fetches!`);
-    })
+      keys.map(key => key !== CACHE_STATIC ? caches.delete(key) : null)
+    ))
+      .then(() => console.log(`${CACHE_STATIC} now ready to handle fetches!`))
   );
 });
 
@@ -57,79 +52,44 @@ self.addEventListener('fetch', (event) => {
   let newPath;
   if (url.hostname.indexOf('maps') > -1) {
     event.respondWith(
-      caches.open(CACHE_MAP).then((cache) => {
-        return cache.match(event.request).then((response) => {
-          // if (url.href.indexOf('spotlight-poi2') > -1 && response) {
-          //   send_message_to_all_clients({ message: 'confirmed'});
-          // }
-          return response || fetch(url.href, { mode: 'no-cors' }).then((response) => {
-            // if (url.href.indexOf('spotlight-poi2') > -1) {
-            //   send_message_to_all_clients({ message: 'confirmed' });
-            //   console.log('Message sent from SW to Client');
-            // }
+      caches.open(CACHE_MAP)
+        .then((cache) => cache.match(event.request)
+          .then((match) => match || fetch(url.href, { mode: 'no-cors' }))
+          .then((response) => {
             cache.put(event.request, response.clone());
             return response;
-          }, (error) => console.error(error));
-        });
-      })
-    );
-  } else if (url.pathname.indexOf('restaurant.html') > -1) {
+          },
+          (error) => console.error(error)))
+    )
+  }
+  else if (url.pathname.indexOf('restaurant.html') > -1) {
     newPath = url.href.replace(/[?&]id=\d/, '');
     event.respondWith(
-      caches.open(CACHE_STATIC).then((cache) => {
-        return cache.match(newPath).then((match) => {
-          return match || fetch(event.request).then((response) => {
+      caches.open(CACHE_STATIC)
+        .then((cache) => cache.match(newPath)
+          .then((match) => match || fetch(event.request))
+          .then((response) => {
             cache.put(newPath, response.clone());
             return response;
-          }, (error) => console.error(error));
-        });
-      })
+          },
+          (error) => console.error(error)))
     );
-  } else if (url.pathname.indexOf('browser-sync') > -1 || url.pathname.endsWith('restaurants.json')) {
+  }
+  else if (url.pathname.indexOf('browser-sync') > -1 || url.pathname.endsWith('restaurants.json')) {
     event.respondWith(fetch(event.request));
-  } else if (url.pathname.indexOf('assets/img') > -1 || url.pathname.endsWith('restaurants.json')) {
-    event.respondWith(fetch(event.request));
-  } else {
+  }
+  else if (url.hostname.startsWith('localhost') || url.hostname.startsWith('hally.github.io')) {
     event.respondWith(
-      caches.open(CACHE_STATIC).then((cache) => {
-        return cache.match(event.request).then((match) => {
-
-          return match || fetch(event.request).then((response) => {
-            cache.put(event.request, response.clone());
-            return response;
-          }, (error) => console.error(error));
+      caches.open(CACHE_STATIC)
+        .then((cache) => {
+          return cache.match(event.request)
+            .then((match) => match || fetch(event.request))
+            .then((response) => {
+              cache.put(event.request, response.clone());
+              return response;
+            },
+            (error) => console.error(error))
         })
-      })
     );
   }
 });
-
-self.addEventListener('message', (event) => {
-  console.log('Message received from Client', event.data);
-
-  event.ports[0].postMessage('Service worker says Hello !');
-});
-
-function send_message_to_all_clients(msg) {
-  clients.matchAll().then(clients => {
-    clients.forEach(client => {
-      send_message_to_client(client, msg)
-        .then(m => console.log(`SW Received Message: ${m}`));
-    });
-  });
-}
-function send_message_to_client(client, msg) {
-  return new Promise(function (resolve, reject) {
-    var msg_chan = new MessageChannel();
-
-    msg_chan.port1.onmessage = function (event) {
-      if (event.data.error) {
-        reject(event.data.error);
-      } else {
-        resolve(event.data);
-      }
-    };
-
-    client.postMessage(msg, [msg_chan.port2]);
-  });
-}

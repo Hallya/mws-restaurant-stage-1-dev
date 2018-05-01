@@ -1,19 +1,17 @@
 /* global DBHelper */
 import DBHelper from './dbhelper';
+import LazyLoading from './helpers';
 var restaurant;
 var map;
 
+document.addEventListener('load', (event) => {
+  
+})
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('../sw.js').then(registration => {
-      console.log('registration to serviceWorker complete with scope :', registration.scope);
-    });
-    navigator.serviceWorker.addEventListener('message', (event) => {
-      if (event.data.message === 'confirmed') {
-        DBHelper.switchLoaderToMap();
-        console.log('Switch done');
-      }
-    });
+    const pathToServiceWorker = window.location.hostname === 'hallya.github.io' ? '/mws-restaurant-stage-1/sw.js' : '../sw.js'
+    navigator.serviceWorker.register(pathToServiceWorker).then(registration => console.log('registration to serviceWorker complete with scope :', registration.scope));
   });
 }
 /**
@@ -27,9 +25,7 @@ window.initMap = () => {
         center: restaurant.latlng,
         scrollwheel: false
       });
-      // self.map.addListener('idle', () => {
-      //   DBHelper.switchLoaderToMap();
-      // });
+      LazyLoading();
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
       fillBreadcrumb();
     });
@@ -40,6 +36,7 @@ window.initMap = () => {
  */
 const fetchRestaurantFromURL = () => {
   if (self.restaurant) { // restaurant already fetched!
+    console.log('restaurant already fetch');
     return;
   }
   const id = getParameterByName('id');
@@ -63,44 +60,66 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   address.innerHTML = restaurant.address;
   address.setAttribute('aria-label', `located at ${restaurant.address}`);
   
+  const figure = document.getElementsByTagName('figure')[0];
+  const figcaption = document.getElementsByTagName('figcaption')[0];
+  const picture = document.createElement('picture');
   
-  const sourceWebp = document.getElementById('restaurant-sourceWebp');
+  const sourceWebp = document.createElement('source');
   sourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-large_x1.webp 1x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-large_x2.webp 2x`;
   sourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-lazy.webp`;
+  sourceWebp.className = 'lazy';
   sourceWebp.media = '(min-width: 1000px)';
   sourceWebp.type = 'image/webp';
-  const source = document.getElementById('restaurant-source');
+  const source = document.createElement('source');
   source.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-large_x2.jpg 2x`;
   source.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  source.className = 'lazy';
   source.media = sourceWebp.media;
   source.type = 'image/jpeg';
   
-
-  const ndSourceWebp = document.getElementById('restaurant-ndSourceWebp');
-  ndSourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-medium_x1.webp 1x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-medium_x2.webp 2x`;
+  
+  const ndSourceWebp = document.createElement('source');
+  ndSourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-medium_x1.webp 1x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-medium_x2.webp 2x`;
+  ndSourceWebp.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  ndSourceWebp.className = 'lazy';
   ndSourceWebp.media = '(min-width: 420px)';
   ndSourceWebp.type = 'image/webp';
-  const ndSource = document.getElementById('restaurant-ndSource');
-  ndSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x2.jpg 2x`;
+  const ndSource = document.createElement('source');
+  ndSource.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x2.jpg 2x`;
+  ndSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  ndSource.className = 'lazy';
   ndSource.media = ndSourceWebp.media;
   ndSource.type = 'image/jpeg';
   
-  const thSource = document.getElementById('restaurant-thSource');
-  const thSourceWebp = document.getElementById('restaurant-thSourceWebp');
-  thSourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-small_x2.webp 2x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-small_x1.webp 1x`;
+  const thSourceWebp = document.createElement('source');
+  thSourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-small_x2.webp 2x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-small_x1.webp 1x`;
+  thSourceWebp.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  thSourceWebp.className = 'lazy';
   thSourceWebp.media = '(min-width: 320px)';
   thSourceWebp.type = 'image/webp';
-  thSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-small_x2.jpg 2x, ${DBHelper.imageUrlForRestaurant(restaurant)}-small_x1.jpg 1x`;
+  const thSource = document.createElement('source');
+  thSource.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-small_x2.jpg 2x, ${DBHelper.imageUrlForRestaurant(restaurant)}-small_x1.jpg 1x`;
+  thSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  thSource.className = 'lazy';
   thSource.media = thSourceWebp.media;
   thSource.type = 'image/jpeg';
   
-  const image = document.getElementById('restaurant-img');
-  image.className = 'restaurant-img';
-  image.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg`;
+  const image = document.createElement('img');
+  image.className = 'restaurant-img lazy';
+  image.dataset.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg`;
+  image.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
   image.setAttribute('sizes', '(max-width: 1100px) 85vw, (min-width: 1101px) 990px');
   image.alt = `${restaurant.name}'s  restaurant`;
   image.type = 'image/jpeg';
 
+  picture.appendChild(sourceWebp);
+  picture.appendChild(source);
+  picture.appendChild(ndSourceWebp);
+  picture.appendChild(ndSource);
+  picture.appendChild(thSourceWebp);
+  picture.appendChild(thSource);
+  picture.appendChild(image);
+  figure.insertBefore(picture, figcaption);
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
   const labelFoodType = document.createElement('label');
