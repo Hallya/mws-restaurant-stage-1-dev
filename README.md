@@ -4,7 +4,11 @@
 
 ## Project Overview: Stage 1
 
-For the **Restaurant Reviews** projects, I had to incrementally convert a static webpage to a mobile-ready web application. In **Stage One**, I had a static design that lacked accessibility and I converted the design to be responsive on different sized displays and accessible for screen reader use. I had also to add a service worker to begin the process of creating a seamless offline experience for users.
+### Main purpose
+
+For the **Restaurant Reviews** projects, I had to incrementally convert a static webpage to a mobile-ready web application. 
+
+In **Stage One**, I had a static design that lacked accessibility and I converted the design to be responsive on different sized displays and accessible for screen reader use. I had also to add a service worker to begin the process of creating a seamless offline experience for users.
 
 ### Specification
 
