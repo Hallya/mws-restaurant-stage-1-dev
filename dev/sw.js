@@ -1,4 +1,4 @@
-const CACHE_STATIC = 'static-cache-7';
+const CACHE_STATIC = 'static-cache-13';
 const CACHE_MAP = 'cache-map-api-2';
 const URLS_TO_CACHE = [
   'index.html',
@@ -52,15 +52,16 @@ self.addEventListener('fetch', (event) => {
   let newPath;
   if (url.hostname.indexOf('maps') > -1) {
     event.respondWith(
-      caches.open(CACHE_MAP)
-        .then((cache) => cache.match(event.request)
-          .then((match) => match || fetch(url.href, { mode: 'no-cors' }))
-          .then((response) => {
-            cache.put(event.request, response.clone());
-            return response;
-          },
-          (error) => console.error(error)))
-    )
+      // caches.open(CACHE_MAP)
+      //   .then((cache) => cache.match(event.request)
+      //     .then((match) => match || fetch(url.href, { mode: 'no-cors' }))
+      //     .then((response) => {
+      //       cache.put(event.request, response.clone());
+      //       return response;
+      //     },
+      //     (error) => console.error(error)))
+      fetch(event.request)
+    );
   }
   else if (url.pathname.indexOf('restaurant.html') > -1) {
     newPath = url.href.replace(/[?&]id=\d/, '');
