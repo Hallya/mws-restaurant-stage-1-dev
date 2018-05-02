@@ -4,7 +4,7 @@
   "description": "--- #### _Three Stage Course Material Project - Restaurant Reviews_",
   "main": "main.js",
   "scripts": {
-    "dev": "webpack --mode development",
+    "install": "npm i && cd dev && npm i && cd ..",
     "build": "gulp dist && cd dist && git add -A && git commit -m 'app update' && git push"
   },
   "repository": {
