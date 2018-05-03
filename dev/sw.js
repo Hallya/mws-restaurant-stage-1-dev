@@ -1,4 +1,4 @@
-const CACHE_STATIC = 'static-cache-13';
+const CACHE_STATIC = 'static-cache-2';
 const CACHE_MAP = 'cache-map-api-2';
 const URLS_TO_CACHE = [
   'index.html',
@@ -41,9 +41,13 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(keys => Promise.all(
-      keys.map(key => key !== CACHE_STATIC ? caches.delete(key) : null)
-    ))
-      .then(() => console.log(`${CACHE_STATIC} now ready to handle fetches!`))
+      keys.map(key => {
+        if (key !== CACHE_STATIC) {
+          console.log('Deleting', key);
+          return caches.delete(key)
+        }
+      })
+    )).then(() => console.log(`${CACHE_STATIC} now ready to handle fetches!`))
   );
 });
 
@@ -52,15 +56,14 @@ self.addEventListener('fetch', (event) => {
   let newPath;
   if (url.hostname.indexOf('maps') > -1) {
     event.respondWith(
-      // caches.open(CACHE_MAP)
-      //   .then((cache) => cache.match(event.request)
-      //     .then((match) => match || fetch(url.href, { mode: 'no-cors' }))
-      //     .then((response) => {
-      //       cache.put(event.request, response.clone());
-      //       return response;
-      //     },
-      //     (error) => console.error(error)))
-      fetch(event.request)
+      caches.open(CACHE_MAP)
+        .then((cache) => cache.match(event.request)
+          .then((match) => match || fetch(url.href, { mode: 'no-cors' }))
+          .then((response) => {
+            cache.put(event.request, response.clone());
+            return response;
+          }, (error) => console.error(error)))
+      // fetch(event.request)
     );
   }
   else if (url.pathname.indexOf('restaurant.html') > -1) {
@@ -72,14 +75,13 @@ self.addEventListener('fetch', (event) => {
           .then((response) => {
             cache.put(newPath, response.clone());
             return response;
-          },
-          (error) => console.error(error)))
+          }, (error) => console.error(error)))
     );
   }
   else if (url.pathname.indexOf('browser-sync') > -1 || url.pathname.endsWith('restaurants.json')) {
     event.respondWith(fetch(event.request));
   }
-  else if (url.hostname.startsWith('localhost') || url.hostname.startsWith('hally.github.io')) {
+  else if (url.hostname.indexOf(['localhost', 'hally.github.io']) > -1) {
     event.respondWith(
       caches.open(CACHE_STATIC)
         .then((cache) => {
@@ -88,8 +90,7 @@ self.addEventListener('fetch', (event) => {
             .then((response) => {
               cache.put(event.request, response.clone());
               return response;
-            },
-            (error) => console.error(error))
+            },(error) => console.error(error))
         })
     );
   }

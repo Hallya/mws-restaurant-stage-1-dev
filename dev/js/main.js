@@ -1,6 +1,6 @@
 /* global DBHelper */
 import DBHelper from './dbhelper';
-import LazyLoading from './helpers';
+import Launch from './helpers';
 
 let restaurants;
 let neighborhoods;
@@ -33,8 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   fetchNeighborhoods();
   fetchCuisines();
-  updateRestaurants()
-    .then(LazyLoading)  ;
+  updateRestaurants().then(Launch.lazyLoading);
 });
 
 
@@ -166,7 +165,7 @@ window.initMap = () => {
     scrollwheel: false
   });
   updateRestaurants()
-    .then(LazyLoading)
+    .then(Launch.lazyLoading)
     .then(addMarkersToMap)
     .catch(error => console.error(error));
 };

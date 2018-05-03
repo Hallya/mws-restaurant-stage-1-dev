@@ -155,14 +155,6 @@ class DBHelper {
     return marker;
   }
 
-  // static switchLoaderToMap() {
-  //   if (document.getElementById('map').classList.contains('hidden')) {
-  //     document.getElementById('map').classList.remove('hidden');
-  //     document.getElementById('map-loader').classList.add('hidden');
-  //   }
-  //   return;
-  // }
-
   // static sendMessage(message) {
   //   return new Promise(function (resolve, reject) {
   //     var messageChannel = new MessageChannel();
