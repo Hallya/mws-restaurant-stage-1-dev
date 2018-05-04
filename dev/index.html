@@ -10,7 +10,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="#252831">
     <link rel="preload" href="https://fonts.googleapis.com/css?family=Montserrat|Righteous" as="font">
     <link rel="preload" href="assets/css/index.css" as="style">
-    <!-- <link rel="preload" href="http://localhost:1337/restaurants" as="fetch"> -->
+    <link rel="preload" href="http://localhost:1337/restaurants" as="fetch">
+    <link rel="preload" href="assets/img/svg/map-loader.svg" as="image">
     <link rel="prefetch" href="restaurant.html"> 
     <!--
       <link rel="preload" href="assets/css/fonts/iconicfill.woff2" as="font">
@@ -33,6 +34,7 @@
     <link rel="icon" type="image/png" href="assets/img/png/logo-256.png"sizes="256x256"/>
     <link rel="icon" type="image/png" href="assets/img/png/logo-512.png"sizes="512x512"/>
     <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="image" href="assets/img/svg/map-loader.svg">
     <link rel="manifest" href="manifest.webmanifest">
     <title>Restaurant Reviews</title>
     <style>
@@ -64,10 +66,9 @@
       <a href="#list-container" aria-label="Skip to the list of restaurant" role="link"></a>
       
       <section id="map-container" aria-label="map" role="application">
-        <div id="map"  tabindex="-1" aria-hidden="true"></div>
-        <!-- <aside id="map-loader" class="hidden">
+        <aside id="map-loader">
           <img src="assets/img/svg/map-loader.svg" height="100%" width="100%">
-        </aside> -->
+        </aside>
       </section>
       
       <section id="list-container" aria-label="list of restaurants">

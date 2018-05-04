@@ -15,7 +15,7 @@ const mainContent = document.querySelector('main'),
   filterButton = document.querySelector('#menuFilter'),
   listOfRestaurants = document.querySelector('#restaurants-list'),
   // sectionRestaurantsList = document.querySelector('#list-container'),
-  sectionMap = document.querySelector('#map-container'),
+  sectionMap = document.getElementById('#map-container'),
   neighborhoodsSelect = document.querySelector('#neighborhoods-select'),
   cuisinesSelect = document.querySelector('#cuisines-select'),
   mapDiv = document.querySelector('#map'),
@@ -155,14 +155,22 @@ const fillCuisinesHTML = (cuisines = self.cuisines) => {
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
+  const mapPlaceHolder = document.createElement('div');
+  mapPlaceHolder.setAttribute('tabindex', '-1');
+  mapPlaceHolder.setAttribute('aria-hidden', 'true');
+  mapPlaceHolder.id = "map";
   let loc = {
     lat: 40.722216,
     lng: -73.987501
   };
-  self.map = new google.maps.Map(document.getElementById('map'), {
+  self.map = new google.maps.Map(mapPlaceHolder, {
     zoom: 12,
     center: loc,
     scrollwheel: false
+  });
+  document.getElementById('map-container').appendChild(mapPlaceHolder);
+  self.map.addListener('tilesloaded', function (evt) {
+    loader.remove();
   });
   updateRestaurants()
     .then(Launch.lazyLoading)

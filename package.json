@@ -5,8 +5,10 @@
   "main": "main.js",
   "scripts": {
     "deployment": "npm install && cd dev && npm install && cd ..",
-    "start": "gulp copy-images &&  gulp webp && gulp",
-    "start:prod": "gulp copy-images && gulp webp && gulp build",
+    "start": "gulp",
+    "start:img": "gulp copy-images &&  gulp webp && gulp",
+    "start:prod": "gulp build",
+    "start:prod+img": "gulp copy-images && gulp webp && gulp build",
     "upload:dev": "git add -A && git commit -m 'app update' && git push",
     "upload:minified": "gulp dist && cd dist && git add -A && git commit -m 'app update' && git push",
     "images": "gulp copy-images && gulp webp"
