@@ -1,12 +1,8 @@
 /* global DBHelper */
 import DBHelper from './dbhelper';
-import LazyLoading from './helpers';
+import Launch from './helpers';
 var restaurant;
 var map;
-
-document.addEventListener('load', (event) => {
-  
-})
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -24,11 +20,12 @@ window.initMap = () => {
         zoom: 16,
         center: restaurant.latlng,
         scrollwheel: false
-      });
-      LazyLoading();
+      })
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
       fillBreadcrumb();
-    });
+    })
+    .then(Launch.lazyLoading)
+    .catch(error => console.error(error));
 };
 
 /**

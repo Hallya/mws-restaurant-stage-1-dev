@@ -25,13 +25,17 @@ gulp.task('default', ['styles', 'copy-html', 'scripts', 'copy-manifest'],() => {
     'dist/index.html',
     'dist/restaurant.html'
   ]).on('change', browserSync.reload);
-  browserSync.init({server: 'dist'});
+  browserSync.init({
+    server: {
+      baseDir: './dist'
+    }
+  });
 });
 
 gulp.task('build', ['styles', 'copy-html', 'scripts-dist', 'copy-manifest'], () => {
   gulp.watch('*/**/*.scss', ['styles']).on('change', browserSync.reload);
   gulp.watch(['dev/*.html'], ['copy-html']).on('change', browserSync.reload);
-  gulp.watch(['dev/js/**/*.js', 'dev/sw.js'], ['scripts-dist']).on('change', browserSync.reload);
+  gulp.watch(['dev/js/**/*.js', 'dev/sw.js'], ['scripts-dist']);
   gulp.watch('dev/manifest.json', ['copy-manifest']).on('change', browserSync.reload);
   gulp.watch([
     'dist/index.html',
@@ -42,7 +46,7 @@ gulp.task('build', ['styles', 'copy-html', 'scripts-dist', 'copy-manifest'], () 
 
 gulp.task('dist', ['styles', 'copy-html', 'scripts-dist', 'copy-data', 'copy-manifest']);
 
-gulp.task('scripts', () => {
+gulp.task('scripts', (done) => {
   gulp.src(['dev/js/main.js', 'dev/js/restaurant_info.js'])
     .pipe(browserify({
       transform: [
@@ -57,9 +61,11 @@ gulp.task('scripts', () => {
       ]
     })) 
     .pipe(gulp.dest('dist'));
+    browserSync.reload();
+    done();
   });
   
-  gulp.task('scripts-dist', () => {
+  gulp.task('scripts-dist', (done) => {
     gulp.src(['dev/js/main.js', 'dev/js/restaurant_info.js'])
       .pipe(browserify({
         transform: [
@@ -79,14 +85,16 @@ gulp.task('scripts', () => {
         ]
       }))
       .pipe(gulp.dest('dist'));
+    browserSync.reload();
+    done();
 });
 
 gulp.task('copy-html', () => {
   gulp.src(['dev/index.html'])
     .pipe(smoosher())
-    .pipe(htmlmin({collapseWhitespace: true}))
+    .pipe(htmlmin({ collapseWhitespace: true }))
     .pipe(gulp.dest('dist/'));
-    gulp.src(['dev/restaurant.html'])
+  gulp.src(['dev/restaurant.html'])
     .pipe(smoosher())
     .pipe(htmlmin({ collapseWhitespace: true}))
     .pipe(gulp.dest('dist/'));
@@ -173,4 +181,13 @@ gulp.task('styles', () => {
     .pipe(browserSync.stream());
   gulp.src('dev/assets/css/fonts/*')
     .pipe(gulp.dest('dist/assets/css/fonts/'));
+});
+
+gulp.task('styles-uncompressed', () => {
+  gulp.src('dev/assets/sass/**/*.scss')
+    .pipe(sass().on('error', sass.logError))
+    .pipe(autoprefixer({ browsers: ['last 2 versions'] }))
+    .pipe(gulp.dest('dev/assets/css'))
+    .pipe(gulp.dest('dist/assets/css'))
+    .pipe(browserSync.stream());
 });

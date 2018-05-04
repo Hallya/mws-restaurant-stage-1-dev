@@ -11,10 +11,23 @@ class DBHelper {
    * Fetch all restaurants.
    */
   static fetchRestaurants() {
-    return fetch(DBHelper.DATABASE_URL)
-      .then(response => response.json())
-      .then(data => window.navigator.standalone ? data.restaurants : data)
-      .catch(error => console.error(`Request failed. Returned status of ${error}`));
+    const store = 'restaurants';
+    return idbKey.getAll(store)
+      .then(restaurants => {
+        if (restaurants.length < 10) {
+          return fetch(DBHelper.DATABASE_URL)
+            .then(response => response.json())
+            .then(restaurants => {
+              console.log('fetch Restaurants called !');
+              restaurants.forEach(restaurant => idbKey.set(store, restaurant));
+              return restaurants;
+            })
+            .then(data => window.navigator.standalone ? data.restaurants : data)
+            .catch(error => console.error(`Request failed. Returned status of ${error}`));
+        } else {
+          return restaurants;
+        }
+      }).catch(error => console.error(error));
   }
 
   /**

@@ -1,4 +1,4 @@
-const CACHE_STATIC = 'static-cache-2';
+const CACHE_STATIC = 'static-cache-4';
 const CACHE_MAP = 'cache-map-api-2';
 const URLS_TO_CACHE = [
   'index.html',
@@ -19,7 +19,8 @@ const URLS_TO_CACHE = [
   'assets/img/png/logo-128.png',
   'assets/img/png/logo-256.png',
   'assets/img/png/logo-512.png',
-  'assets/css/styles.css',
+  'assets/css/index.css',
+  'assets/css/restaurant_info.css',
   'js/main.js',
   'js/restaurant_info.js',
 ];

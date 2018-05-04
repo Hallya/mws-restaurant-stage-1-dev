@@ -1,0 +1,498 @@
+@charset "utf-8";
+
+@font-face {
+  font-family: "breadcrumb";
+  src: url('fonts/fontawesome.woff2');
+}
+
+$screen-s-min: 320px;
+$screen-m-min: 550px;
+$screen-l-min: 1000px;
+$screen-xl-min: 2000px;
+$first-color: #ca0000;
+$second-color: #f58400;
+$background-primary-color: #fff;
+$background-secondary-color: #252831;
+@mixin m {
+  @media screen and (min-width: #{$screen-m-min}) {
+    @content;
+  }
+}
+
+@mixin l {
+  @media screen and (min-width: #{$screen-l-min}) {
+    @content;
+  }
+}
+
+@mixin xl {
+  @media screen and (min-width: #{$screen-xl-min}) {
+    @content;
+  }
+}
+
+[class*="fontawesome-"]:before {
+  content: '\f061';
+  font-family: 'breadcrumb', sans-serif;
+  color: $background-primary-color;
+}
+
+body,
+td,
+th,
+p {
+  color: $background-secondary-color;
+  line-height: 1.5;
+}
+
+body {
+  background-color: white;
+  margin: 0;
+  font-size: 16px;
+  width: 100%;
+  max-width: 100%;
+}
+
+main ul,
+li {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  color: $background-secondary-color;
+}
+
+figure,
+figcaption {
+  margin: 0;
+  padding: 0;
+}
+
+p {
+  text-align: right;
+  padding-right: 5%;
+  font-family: 'Montserrat', sans-serif;
+}
+
+a {
+  color: orange;
+  text-decoration: none;
+}
+
+a:hover,
+a:focus {
+  color: #3397db;
+  text-decoration: none;
+}
+
+a img {
+  border: none 0px $background-primary-color;
+}
+
+a{
+  min-width: 48px;
+  min-height: 48px;
+}
+
+#map a,
+button,
+select {
+  min-width: 0;
+  min-height: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+article,
+aside,
+canvas,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section,
+img {
+  display: block;
+  max-width: 100%;
+}
+
+header {
+  height: 7em;
+  @include xl {
+    height: 8em;
+  }
+  #breadcrumb {
+    list-style: none;
+    background-color: $background-secondary-color;
+    height: 30%;
+    width: 100%;
+    padding-left: 1%;
+    @include xl {
+      font-size: 1.3em;
+    }
+    li {
+      display: inline;
+      color: $background-primary-color;
+      font-size: 1em;
+      font-family: 'Montserrat', sans-serif;
+      padding-right: 5px;
+      @include m {
+        font-size: 1.5em;
+      }
+      /* Add a color to all links the list */
+      a {
+        color: #f58301;
+        text-decoration: none;
+        /* Add a color on mouse-over */
+        a:hover {
+          color: #01447e;
+          text-decoration: underline;
+        }
+      }
+      /* Add a slash symbol (/) before/behind each list item */
+    }
+  }
+}
+
+main {
+  @include m {
+    width: 550px;
+    margin: 0 auto 0 auto;
+    transition: 0.4s ease-in-out;
+  }
+  @include l {
+    width: 900px;
+  }
+  @include xl {
+    width: 1900px;
+    display: flex;
+    justify-content: center;
+    flex-flow: wrap row;
+    align-items: center;
+  }
+}
+
+#maincontent {
+  background-color: $background-primary-color;
+}
+
+#footer {
+  background-color: $background-secondary-color;
+  color: #dbdbdb;
+  padding: 1%;
+  font-size: 0.8em;
+  letter-spacing: 1px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ====================== Navigation ====================== */
+
+nav {
+  width: 100%;
+  height: 100%;
+  background-color: $background-secondary-color;
+  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  @include m {
+    position: relative;
+    z-index: 1;
+  }
+  h1 {
+    width: 80%;
+    margin-left: 5%;
+    text-align: left;
+    a {
+      color: $background-primary-color;
+      font-size: 1em;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      @include m {
+        font-size: 1.3em;
+        background-color: $first-color;
+        border-radius: 25px;
+      }
+      @include xl {
+        font-size: 3em;
+      }
+    }
+  }
+}
+
+/* ====================== Map ====================== */
+
+#map-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  transition: 0.2s;
+  box-shadow: 0 0 80px -25px black;
+  background-color: $background-secondary-color;
+  @include m {
+    height: 320px;
+    width: 550px;
+    margin: 2% auto;
+    border-radius: 25px;
+  }
+  @include xl {
+    width: 1200px;
+    height: 25em;
+    align-self: baseline;
+    margin: 7em 0 0 0;
+  }
+  #map {
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    position: absolute;
+    background: $background-secondary-color;
+    @include m {
+      border-radius: 25px;
+    }
+  }
+}
+
+/* ====================== Restaurant Details ====================== */
+
+.inside {
+  header {
+    width: 100%;
+    background-color: $background-secondary-color;
+    @include l {
+      height: 8em;
+    }
+    @include xl {
+      height: 13em;
+    }
+  }
+  nav {
+    height: 65%;
+    background-color: $background-secondary-color;
+    h1 {
+      @include l {
+        font-size: 1.9em;
+      }
+    }
+  }
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+  #restaurant-container {
+    @include l {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-flow: column wrap;
+      align-content: center;
+      height: 30em;
+    }
+    @include xl {
+      width: 100%;
+      height: 60em;
+      order: 1;
+    }
+    h1,
+    h2 {
+      padding: 2%;
+      color: $first-color;
+      width: 90%;
+      margin: 0 auto;
+      text-align: left;
+      text-shadow: 1px 1px #00000029;
+    }
+    h2 {
+      @include xl {
+        padding: 1%;
+      }
+    }
+    figure {
+      @include l {
+        width: 55%;
+      }
+    }
+    #restaurant-name {
+      color: #f58400;
+      width: 96%;
+      background: $background-secondary-color;
+      font-size: 20pt;
+      font-weight: 200;
+      letter-spacing: 0;
+      margin: 0 auto;
+      text-transform: uppercase;
+      line-height: 1.1;
+      @include m {
+        border-top-left-radius: 25px;
+        border-top-right-radius: 25px;
+      }
+      @include l {
+        width: 96%;
+      }
+      @include xl {
+        background: $background-primary-color;
+        font-size: 3em;
+        width: 100%;
+      }
+    }
+    img,
+    source {
+      width: 100%;
+      @include l {
+        margin: 0 auto;
+      }
+    }
+    #restaurant-img,
+    #restaurant-cuisine {
+      @include l {
+        width: 100%;
+        margin: 0 auto;
+      }
+    }
+    #restaurant-img {
+      width: 100%;
+      border-top: 5px solid;
+    }
+    #restaurant-cuisine {
+      background-color: $background-secondary-color;
+      color: $background-primary-color;
+      font-size: 12pt;
+      font-weight: 300;
+      letter-spacing: 10px;
+      margin: 0 0 20px;
+      padding: 2px 0;
+      text-align: center;
+      text-transform: uppercase;
+      width: 100%;
+      @include m {
+        border-bottom-left-radius: 25px;
+        border-bottom-right-radius: 25px;
+      }
+      @include xl {
+        background: $background-primary-color;
+        color: $background-secondary-color;
+        font-size: 1.5em;
+        width: 100%;
+      }
+    }
+    #restaurant-address,
+    #restaurant-hours {
+      @include l {
+        width: 51%;
+      }
+    }
+    #restaurant-address {
+      font-size: 0.8em;
+      margin: 5% 0;
+      @include l {
+        font-size: 1.5em;
+      }
+      @include xl {
+        font-size: 2em;
+        margin: 0;
+      }
+    }
+    #restaurant-hours {
+      margin: 5% auto 5% auto;
+      font: 0.8em 'Montserrat', sans-serif;
+      @include xl {
+        font-size: 1.1em;
+      }
+      td {
+        color: #666;
+        @include m {
+          font-size: 1.4em;
+        }
+      }
+    }
+    #restaurant-container,
+    #reviews-container {
+      border-bottom: 1px solid #d9d9d9;
+      border-top: 1px solid $background-primary-color;
+      width: 100%;
+    }
+  }
+  #reviews-container {
+    background-color: white;
+    @include xl {
+      width: 60%;
+      order: 2;
+    }
+    h3 {
+      color: $first-color;
+      font-size: 2em;
+      font-weight: 300;
+      text-align: center;
+      letter-spacing: -1px;
+      padding-bottom: 1pt;
+      padding: 0;
+      margin: 0;
+      @include xl {
+        font-size: 4em;
+        margin: 0;
+      }
+    }
+    #reviews-list {
+      margin: 0;
+      padding: 0;
+      background-color: $background-primary-color;
+      @include xl {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+      }
+      li {
+        background-color: $background-primary-color;
+        display: block;
+        list-style-type: none;
+        overflow: hidden;
+        margin: 2%;
+        padding: 4%;
+        box-shadow: 0 0 80px -30px black;
+        border-radius: 5%;
+        position: relative;
+        @include xl {
+          width: 20%;
+          font-size: 1.2em;
+        }
+        p {
+          margin: 0 0 10px;
+          text-align: justify;
+        }
+        .dateReview {
+          font-style: italic;
+        }
+        .userName {
+          font: 1.2em 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        }
+        .userRating {
+          font: 1em 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+          .ratingStars {
+            color: $first-color;
+          }
+        }
+      }
+    }
+  }
+  #footer {
+    background-color: $background-secondary-color;
+    color: #dbdbdb;
+    padding: 1%;
+    font-size: 0.8em;
+    letter-spacing: 1px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+}

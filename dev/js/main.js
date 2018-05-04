@@ -24,6 +24,7 @@ const mainContent = document.querySelector('main'),
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOMContentLoaded');
   if (
     !window.navigator.standalone
     && (window.navigator.userAgent.indexOf('Android') === -1
@@ -31,9 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
   ) {
     addBannerToHomeScreen();
   }
-  fetchNeighborhoods();
-  fetchCuisines();
-  updateRestaurants().then(Launch.lazyLoading);
+  fetchNeighborhoods()
+    .then(fetchCuisines)
+    .catch(error => console.error(error))
 });
 
 
@@ -95,15 +96,14 @@ document.onkeypress = function (e) {
     // window.scrollTo(0, sectionMap.clientHeight*2);
   }
 };
-
 /**
  * Fetch all neighborhoods and set their HTML.
  */
 const fetchNeighborhoods = () => {
-  DBHelper.fetchNeighborhoods()
-  .then(neighborhoods => {
-    self.neighborhoods = neighborhoods;
-    fillNeighborhoodsHTML();
+  return DBHelper.fetchNeighborhoods()
+    .then(neighborhoods => {
+      self.neighborhoods = neighborhoods;
+      fillNeighborhoodsHTML();
     })
     .catch(error => console.error(error));
 };
@@ -128,9 +128,9 @@ const fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
  */
 const fetchCuisines = () => {
   DBHelper.fetchCuisines()
-  .then(cuisines => {
-    self.cuisines = cuisines;
-    fillCuisinesHTML();
+    .then(cuisines => {
+      self.cuisines = cuisines;
+      fillCuisinesHTML();
     })
     .catch(error => console.error(error));
 };
