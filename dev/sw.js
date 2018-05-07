@@ -1,4 +1,4 @@
-const CACHE_STATIC = 'static-cache-12';
+const CACHE_STATIC = 'static-cache-13';
 const CACHE_MAP = 'cache-map-api-2';
 const URLS_TO_CACHE = [
   'index.html',

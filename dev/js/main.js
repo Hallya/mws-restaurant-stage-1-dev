@@ -107,10 +107,9 @@ document.onkeypress = function (e) {
  */
 const fetchNeighborhoods = () => {
   return DBHelper.fetchNeighborhoods()
-  .then(neighborhoods => {
-    self.neighborhoods = neighborhoods;
-    fillNeighborhoodsHTML();
-    self.loading = false;
+    .then(neighborhoods => {
+      self.neighborhoods = neighborhoods;
+      fillNeighborhoodsHTML();
     })
     .catch(error => console.error(error));
 };

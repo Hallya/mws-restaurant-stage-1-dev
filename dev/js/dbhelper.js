@@ -20,10 +20,9 @@ class DBHelper {
             .then(response => response.json())
             .then(restaurants => {
               console.log('- Restaurants data fetched !');
-              restaurants.forEach(restaurant => idbKey.set(store, restaurant));
-              return restaurants;
+              return restaurants.restaurants || restaurants;
             })
-            .then(data => data.restaurants || data)
+            .then(restaurants => restaurants.forEach(restaurant => idbKey.set(store, restaurant)), restaurants)
             .catch(error => console.error(`Request failed. Returned status of ${error}`));
         } else {
           return restaurants;
