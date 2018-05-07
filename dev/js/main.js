@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
   ) {
     addBannerToHomeScreen();
   }
+  cuisinesSelect.addEventListener('change', updateRestaurants);
+  neighborhoodsSelect.addEventListener('change', updateRestaurants);
   fetchNeighborhoods()
     .then(fetchCuisines)
     .then(updateRestaurants)
@@ -177,6 +179,7 @@ window.initMap = () => {
   self.map.addListener('tilesloaded', function () {
     loader.remove();
     updateRestaurants()
+      .then(addMarkersToMap)
   });
 };
 
@@ -192,7 +195,7 @@ const updateRestaurants = () => {
 
   if (cuisine === cSelect[cIndex].value && neighborhood === nSelect[nIndex].value) {
     console.log('- Restaurants list already update');
-    return;
+    return Promise.resolve();
   }
   cuisine = cSelect[cIndex].value;
   neighborhood = nSelect[nIndex].value;
@@ -201,7 +204,6 @@ const updateRestaurants = () => {
     .then(resetRestaurants)
     .then(fillRestaurantsHTML)
     .then(Launch.lazyLoading)
-    .then(addMarkersToMap)
     .then(() => console.log('- Restaurants list updated !'))
     .catch(error => console.error(error))
 };
@@ -217,7 +219,7 @@ const resetRestaurants = (restaurants) => {
 
   // Remove all map markers
   if (markers.length > 0) {
-    self.markers.forEach(m => m.setMap(null));
+    self.markers.forEach(marker => marker.setMap(null));
   }
   self.markers = [];
   self.restaurants = restaurants;
@@ -350,8 +352,8 @@ const createRestaurantHTML = (restaurant) => {
  * Add markers for current restaurants to the map.
  */
 const addMarkersToMap = (restaurants = self.restaurants) => {
+  // Add marker to the map
   restaurants.forEach(restaurant => {
-    // Add marker to the map
     const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
     google.maps.event.addListener(marker, 'click', () => {
       window.location.href = marker.url;

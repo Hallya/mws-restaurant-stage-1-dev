@@ -145,7 +145,8 @@ h2,
 h3,
 h4,
 h5,
-h6 {
+h6,
+select {
   font-family: 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold',sans-serif;
 }
 
@@ -347,7 +348,7 @@ nav {
     }
   }
   .pressed {
-    color: rgb(255, 145, 0);
+    color: $first-color;
   }
   .iconicfill-x {
     color: $background-primary-color;
@@ -371,19 +372,19 @@ nav {
   border-bottom: 3px solid #35b7ab;
   border-bottom-left-radius: 25px;
   border-bottom-right-radius: 25px;
-  background: linear-gradient(to right, #97fffb 10%, #00d2b5 100%);
+  // background$first-color;
+  background: linear-gradient(to bottom, #a50000 10%, $first-color 100%);
   transition: 0.4s ease-in-out;
   
   @include m {
-    height: 7em;
+    height: 4em;
     width: 100vw;
     z-index: 0;
   }
   h3 {
-    color: $background-secondary-color;
+    color: #6d0090;
     font-weight: normal;
-    text-decoration: underline;
-    margin: 10% 0 5%;
+    margin: 0%;
     width: 100%;
     font-size: 1.7em;
 
@@ -395,30 +396,30 @@ nav {
   }
   
   select {
-    background-color: $background-primary-color;
-    border: 1px solid  $background-primary-color;
-    font-family: Arial, sans-serif;
-    font-size: 11pt;
+    background-color: transparent;
+    border: 1px solid #ffd3d3;
+    color: white;
+    font-size: 1.3em;
     height: 35px;
     letter-spacing: 0;
-    margin: 5px;
-    width: 150px;
+    margin: 10px;
+    width: 200px;
   }
 }
 
 .optionsOpen {
   transform: translate3d(-1em, -7em, 0);
   visibility: visible;
-
+  opacity: 1;
   @include m {
     transform: translateY(0em);
   }
 }
 
 .optionsClose {
-  transform: translate3d(-16em, -7em, 0);
+  transform: translate3d(-1em, -22em, 0);
   visibility: hidden;
-
+  opacity: 0;
   @include m {
     transform: translateY(-7.5em);
   }

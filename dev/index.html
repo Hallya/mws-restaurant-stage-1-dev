@@ -49,13 +49,13 @@
         <label id="filtersSettings" hidden>Filter settings</label>
       </nav>
       <div class="filter-options optionsClose" role="menu" aria-hidden="true">
-        <h3 id="filters">Filter Results</h3>
+        <h3 id="filters" aria-label="filter results"></h3>
         <label id="location" hidden>Choose your location</label>
-        <select id="neighborhoods-select" aria-labelledby="location"  name="neighborhoods" onchange="updateRestaurants()">
+        <select id="neighborhoods-select" aria-labelledby="location"  name="neighborhoods">
           <option value="all" role="option" aria-setsize="4" aria-posinset="1">All Neighborhoods</option>
         </select>
         <label id="cuisines" hidden>Choose your type of food</label>
-        <select id="cuisines-select" aria-labelledby="cuisines" name="cuisines" onchange="updateRestaurants()">
+        <select id="cuisines-select" aria-labelledby="cuisines" name="cuisines">
           <option value="all" role="option" aria-setsize="4" aria-posinset="1">All Cuisines</option>
         </select>
       </div>
