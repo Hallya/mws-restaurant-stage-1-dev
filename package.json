@@ -6,8 +6,8 @@
   "scripts": {
     "deployment": "npm install && cd dev && npm install && cd ..",
     "start": "gulp",
-    "start:img": "gulp copy-images &&  gulp webp && gulp",
     "start:prod": "gulp build",
+    "start:img": "gulp copy-images &&  gulp webp && gulp",
     "start:prod+img": "gulp copy-images && gulp webp && gulp build",
     "upload:dev": "git add -A && git commit -m 'app update' && git push",
     "upload:minified": "gulp dist && cd dist && git add -A && git commit -m 'app update' && git push",
@@ -46,6 +46,7 @@
     "gulp-babel": "^8.0.0-beta.2",
     "gulp-bro": "^1.0.3",
     "gulp-cli": "^2.0.1",
+    "gulp-connect": "^5.5.0",
     "gulp-htmlmin": "^4.0.0",
     "gulp-imagemin": "^4.1.0",
     "gulp-responsive": "^2.10.0",

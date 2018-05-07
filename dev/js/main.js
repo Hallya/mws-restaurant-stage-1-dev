@@ -1,12 +1,16 @@
 /* global DBHelper */
 import DBHelper from './dbhelper';
 import Launch from './helpers';
+import { resolve } from 'url';
+import { rejects } from 'assert';
 
 let restaurants;
 let neighborhoods;
 let cuisines;
-
-var markers = [];
+let loading = false;
+let markers = [];
+let cuisine;
+let neighborhood;
 
 const mainContent = document.querySelector('main'),
   footer = document.querySelector('footer'),
@@ -24,7 +28,6 @@ const mainContent = document.querySelector('main'),
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOMContentLoaded');
   if (
     !window.navigator.standalone
     && (window.navigator.userAgent.indexOf('Android') === -1
@@ -34,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   fetchNeighborhoods()
     .then(fetchCuisines)
+    .then(updateRestaurants)
     .catch(error => console.error(error))
 });
 
@@ -101,9 +105,10 @@ document.onkeypress = function (e) {
  */
 const fetchNeighborhoods = () => {
   return DBHelper.fetchNeighborhoods()
-    .then(neighborhoods => {
-      self.neighborhoods = neighborhoods;
-      fillNeighborhoodsHTML();
+  .then(neighborhoods => {
+    self.neighborhoods = neighborhoods;
+    fillNeighborhoodsHTML();
+    self.loading = false;
     })
     .catch(error => console.error(error));
 };
@@ -169,13 +174,10 @@ window.initMap = () => {
     scrollwheel: false
   });
   document.getElementById('map-container').appendChild(mapPlaceHolder);
-  self.map.addListener('tilesloaded', function (evt) {
+  self.map.addListener('tilesloaded', function () {
     loader.remove();
+    updateRestaurants()
   });
-  updateRestaurants()
-    .then(Launch.lazyLoading)
-    .then(addMarkersToMap)
-    .catch(error => console.error(error));
 };
 
 /**
@@ -188,13 +190,20 @@ const updateRestaurants = () => {
   const cIndex = cSelect.selectedIndex;
   const nIndex = nSelect.selectedIndex;
 
-  const cuisine = cSelect[cIndex].value;
-  const neighborhood = nSelect[nIndex].value;
+  if (cuisine === cSelect[cIndex].value && neighborhood === nSelect[nIndex].value) {
+    console.log('- Restaurants list already update');
+    return;
+  }
+  cuisine = cSelect[cIndex].value;
+  neighborhood = nSelect[nIndex].value;
 
   return DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
     .then(resetRestaurants)
     .then(fillRestaurantsHTML)
-    .catch(error => console.error(error));
+    .then(Launch.lazyLoading)
+    .then(addMarkersToMap)
+    .then(() => console.log('- Restaurants list updated !'))
+    .catch(error => console.error(error))
 };
 
 /**

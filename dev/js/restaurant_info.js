@@ -16,11 +16,19 @@ if ('serviceWorker' in navigator) {
 window.initMap = () => {
   fetchRestaurantFromURL()
     .then(restaurant => {
-      self.map = new google.maps.Map(document.getElementById('map'), {
+      const mapPlaceHolder = document.createElement('div');
+      mapPlaceHolder.setAttribute('tabindex', '-1');
+      mapPlaceHolder.setAttribute('aria-hidden', 'true');
+      mapPlaceHolder.id = "map";
+      self.map = new google.maps.Map(mapPlaceHolder, {
         zoom: 16,
         center: restaurant.latlng,
         scrollwheel: false
       })
+      document.getElementById('map-container').appendChild(mapPlaceHolder);
+      self.map.addListener('tilesloaded', function () {
+        document.getElementById('map-loader').remove();
+      });
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
       fillBreadcrumb();
     })
@@ -33,7 +41,7 @@ window.initMap = () => {
  */
 const fetchRestaurantFromURL = () => {
   if (self.restaurant) { // restaurant already fetched!
-    console.log('restaurant already fetch');
+    console.log('- Restaurant already fetch');
     return;
   }
   const id = getParameterByName('id');

@@ -18,7 +18,7 @@ class DBHelper {
           return fetch(DBHelper.DATABASE_URL)
             .then(response => response.json())
             .then(restaurants => {
-              console.log('fetch Restaurants called !');
+              console.log('- Restaurants data fetched !');
               restaurants.forEach(restaurant => idbKey.set(store, restaurant));
               return restaurants;
             })
@@ -39,7 +39,7 @@ class DBHelper {
     return idbKey.get(store, Number(id))
       .then((restaurant) => {
         if (!restaurant) {
-          console.log('No cache found');
+          console.log('- No cache found');
           return fetch(DBHelper.DATABASE_URL)
             .then(response => response.json())
             .then(data => {

@@ -2,6 +2,7 @@
 
 const gulp = require('gulp');
 const browserify = require('gulp-bro');
+const connect = require('gulp-connect');
 const htmlmin = require('gulp-htmlmin');
 const babelify = require('babelify');
 const sass = require('gulp-sass');
@@ -17,31 +18,26 @@ const webp = require('gulp-webp');
 const smoosher = require('gulp-smoosher');
 
 gulp.task('default', ['styles', 'copy-html', 'scripts', 'copy-manifest'],() => {
-  gulp.watch('*/**/*.scss', ['styles']).on('change', browserSync.reload);
-  gulp.watch(['dev/*.html'], ['copy-html']).on('change', browserSync.reload);
-  gulp.watch(['dev/js/**/*.js', 'dev/sw.js'], ['scripts']).on('change', browserSync.reload);
-  gulp.watch('dev/manifest.json', ['copy-manifest']).on('change', browserSync.reload);
-  gulp.watch([
-    'dist/index.html',
-    'dist/restaurant.html'
-  ]).on('change', browserSync.reload);
-  browserSync.init({
-    server: {
-      baseDir: './dist'
-    }
-  });
+  gulp.watch('*/**/*.scss', ['styles'])
+  gulp.watch(['dev/*.html'], ['copy-html'])
+  gulp.watch(['dev/js/**/*.js', 'dev/sw.js'], ['scripts'])
+  gulp.watch('dev/manifest.json', ['copy-manifest'])
+
+  connect.server({
+    root: 'dist',
+    livereload: true
+  })
 });
 
 gulp.task('build', ['styles', 'copy-html', 'scripts-dist', 'copy-manifest'], () => {
-  gulp.watch('*/**/*.scss', ['styles']).on('change', browserSync.reload);
-  gulp.watch(['dev/*.html'], ['copy-html']).on('change', browserSync.reload);
+  gulp.watch('*/**/*.scss', ['styles'])
+  gulp.watch(['dev/*.html'], ['copy-html']);
   gulp.watch(['dev/js/**/*.js', 'dev/sw.js'], ['scripts-dist']);
-  gulp.watch('dev/manifest.json', ['copy-manifest']).on('change', browserSync.reload);
-  gulp.watch([
-    'dist/index.html',
-    'dist/restaurant.html'
-  ]).on('change', browserSync.reload);
-  browserSync.init({server: 'dist'});
+  gulp.watch('dev/manifest.json', ['copy-manifest']);
+  connect.server({
+    root: 'dist',
+    livereload: true
+  })
 });
 
 gulp.task('dist', ['styles', 'copy-html', 'scripts-dist', 'copy-data', 'copy-manifest']);
@@ -61,7 +57,7 @@ gulp.task('scripts', (done) => {
       ]
     })) 
     .pipe(gulp.dest('dist'));
-    browserSync.reload();
+  connect.reload();
     done();
   });
   
@@ -85,7 +81,7 @@ gulp.task('scripts', (done) => {
         ]
       }))
       .pipe(gulp.dest('dist'));
-    browserSync.reload();
+    connect.reload();
     done();
 });
 
@@ -98,6 +94,7 @@ gulp.task('copy-html', () => {
     .pipe(smoosher())
     .pipe(htmlmin({ collapseWhitespace: true}))
     .pipe(gulp.dest('dist/'));
+  connect.reload();
 });
 
 gulp.task('copy-data', () => {
@@ -108,6 +105,7 @@ gulp.task('copy-data', () => {
 gulp.task('copy-manifest', () => {
   gulp.src('dev/manifest.webmanifest')
     .pipe(gulp.dest('dist'));
+  connect.reload();
 });
 
 gulp.task('copy-images', () => {
@@ -178,7 +176,7 @@ gulp.task('styles', () => {
     .pipe(autoprefixer({ browsers: ['last 2 versions'] }))
     .pipe(gulp.dest('dev/assets/css'))
     .pipe(gulp.dest('dist/assets/css'))
-    .pipe(browserSync.stream());
+    .pipe(connect.reload());
   gulp.src('dev/assets/css/fonts/*')
     .pipe(gulp.dest('dist/assets/css/fonts/'));
 });
@@ -189,5 +187,5 @@ gulp.task('styles-uncompressed', () => {
     .pipe(autoprefixer({ browsers: ['last 2 versions'] }))
     .pipe(gulp.dest('dev/assets/css'))
     .pipe(gulp.dest('dist/assets/css'))
-    .pipe(browserSync.stream());
+    .pipe(connect.reload());
 });

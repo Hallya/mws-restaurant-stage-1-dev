@@ -1,4 +1,4 @@
-const CACHE_STATIC = 'static-cache-3  ';
+const CACHE_STATIC = 'static-cache-2';
 const CACHE_MAP = 'cache-map-api-2';
 const URLS_TO_CACHE = [
   'index.html',
@@ -26,14 +26,14 @@ const URLS_TO_CACHE = [
 ];
 
 self.addEventListener('install', event => {
-  console.log(`cache version : ${CACHE_STATIC}`);
+  console.log(`- Cache version : "${CACHE_STATIC}"`);
   event.waitUntil(
     caches.open(CACHE_STATIC)
       .then(cache => cache.addAll(URLS_TO_CACHE))
       .then(() => {
-        console.log('All resources cached.');
+        console.log('- All resources cached.');
         self.skipWaiting();
-        console.log('SW version skipped.');
+        console.log('- SW version skipped.');
       })
       .catch(error => console.error('Open cache failed :', error))
   );
@@ -43,12 +43,12 @@ self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(keys => Promise.all(
       keys.map(key => {
-        if (key !== CACHE_STATIC) {
-          console.log('Deleting', key);
+        if (key !== CACHE_STATIC && key !== CACHE_MAP) {
+          console.log('- Deleting', key);
           return caches.delete(key)
         }
       })
-    )).then(() => console.log(`${CACHE_STATIC} now ready to handle fetches!`))
+    )).then(() => console.log(`- "${CACHE_STATIC}" now ready to handle fetches!`))
   );
 });
 
