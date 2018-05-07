@@ -15,6 +15,7 @@ class DBHelper {
     return idbKey.getAll(store)
       .then(restaurants => {
         if (restaurants.length < 10) {
+          console.log(`Path to data: ${DBHelper.DATABASE_URL}`)
           return fetch(DBHelper.DATABASE_URL)
             .then(response => response.json())
             .then(restaurants => {
@@ -22,7 +23,7 @@ class DBHelper {
               restaurants.forEach(restaurant => idbKey.set(store, restaurant));
               return restaurants;
             })
-            .then(data => window.navigator.standalone ? data.restaurants : data)
+            .then(data => data.restaurants || data)
             .catch(error => console.error(`Request failed. Returned status of ${error}`));
         } else {
           return restaurants;
