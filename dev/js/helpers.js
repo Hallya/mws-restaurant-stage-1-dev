@@ -62,8 +62,10 @@ const launch = {
       document.addEventListener('scroll', lazyLoad);
       window.addEventListener('resize', lazyLoad);
       window.addEventListener('orientationchange', lazyLoad);
-      if (window.document.readyState === 'complete') {
-        lazyLoad();
+      document.onreadystatechange = function () {
+        if (document.readyState == "complete") {
+          lazyLoad();
+        }
       }
     }
   },
