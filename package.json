@@ -41,6 +41,7 @@
     "babelify": "^8.0.0",
     "browser-sync": "^2.24.4",
     "browserify": "^16.2.0",
+    "cacheify": "^0.4.2",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^5.0.0",
     "gulp-babel": "^8.0.0-beta.2",
@@ -54,6 +55,7 @@
     "gulp-smoosher": "0.0.9",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-uglify": "^3.0.0",
+    "gulp-uglify-es": "^1.0.1",
     "gulp-util": "^3.0.8",
     "gulp-webp": "^3.0.0",
     "uglifyify": "^4.0.5"

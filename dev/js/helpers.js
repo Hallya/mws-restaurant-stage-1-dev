@@ -29,6 +29,7 @@ const launch = {
     } else {
       // Possibly fall back to a more compatible method here
       let lazyImages = [].slice.call(document.querySelectorAll('.lazy'));
+
       let active = false;
       const lazyLoad = function () {
         if (active === false) {
@@ -76,4 +77,4 @@ const launch = {
     }
   }
 };
-export default launch;
+module.exports = launch;

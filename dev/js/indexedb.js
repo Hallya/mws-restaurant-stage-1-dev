@@ -1,4 +1,5 @@
-import idb from '../node_modules/idb/lib/idb';
+const idb = require('../node_modules/idb/lib/idb');
+
 const openDatabase = () => {
   if (!navigator.serviceWorker) return;
   return idb.open('restaurant-reviews', 1, (upgradeDb) => {
@@ -30,4 +31,4 @@ const idbKey = {
     }).catch(error => console.error(error));
   }
 };
-export default idbKey;
+module.exports = idbKey;

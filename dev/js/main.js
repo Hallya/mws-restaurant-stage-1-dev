@@ -1,8 +1,6 @@
-/* global DBHelper */
-import DBHelper from './dbhelper';
-import Launch from './helpers';
-import { resolve } from 'url';
-import { rejects } from 'assert';
+const DBHelper =  require('./dbhelper');
+const launch = require('./helpers');
+
 
 let restaurants;
 let neighborhoods;
@@ -202,7 +200,7 @@ const updateRestaurants = () => {
   return DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
     .then(resetRestaurants)
     .then(fillRestaurantsHTML)
-    .then(Launch.lazyLoading)
+    .then(launch.lazyLoading)
     .then(() => console.log('- Restaurants list updated !'))
     .catch(error => console.error(error))
 };
@@ -266,40 +264,47 @@ const createRestaurantHTML = (restaurant) => {
   const note = document.createElement('p');
 
   sourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-large_x1.webp 1x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-large_x2.webp 2x`;
-  sourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-lazy.webp`;
+  // sourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-lazy.webp`;
+  sourceWebp.srcset = 'assets/img/svg/puff.svg';
   sourceWebp.media = '(min-width: 1000px)';
   sourceWebp.className = 'lazy';
   sourceWebp.type = 'image/webp';
   source.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-large_x2.jpg 2x`;
-  source.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  // source.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  source.srcset = 'assets/img/svg/puff.svg';
   source.media = '(min-width: 1000px)';
   source.className = 'lazy';
   source.type = 'image/jpeg';
   
   secondSourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-medium_x1.webp 1x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-medium_x2.webp 2x`;
-  secondSourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-lazy.webp`;
+  // secondSourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-lazy.webp`;
+  secondSourceWebp.srcset = 'assets/img/svg/puff.svg';
   secondSourceWebp.media = '(min-width: 420px)';
   secondSourceWebp.className = 'lazy';
   secondSourceWebp.type = 'image/webp';
   secondSource.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x2.jpg 2x`;
-  secondSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  // secondSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  secondSource.srcset = 'assets/img/svg/puff.svg';
   secondSource.media = '(min-width: 420px)';
   secondSource.className = 'lazy';
   secondSource.type = 'image/jpeg';
   
   thSourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-small_x2.webp 2x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-small_x1.webp 1x`;
-  thSourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-lazy.webp`;
+  // thSourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-lazy.webp`;
+  thSourceWebp.srcset = 'assets/img/svg/puff.svg';
   thSourceWebp.media = '(min-width: 320px)';
   thSourceWebp.className = 'lazy';
   thSourceWebp.type = 'image/webp';
   thSource.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-small_x2.jpg 2x, ${DBHelper.imageUrlForRestaurant(restaurant)}-small_x1.jpg 1x`;
-  thSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  // thSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  thSource.srcset = 'assets/img/svg/puff.svg';
   thSource.media = '(min-width: 320px)';
   thSource.className = 'lazy';
   thSource.type = 'image/jpeg';
   
   image.dataset.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-small_x1.jpg`;
-  image.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  // image.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  image.src = 'assets/img/svg/puff.svg';
   image.className = 'restaurant-img lazy';
   image.setAttribute('sizes', '(max-width: 1100px) 85vw, (min-width: 1101px) 990px');
   image.alt = `${restaurant.name}'s restaurant`;

@@ -325,6 +325,7 @@ nav {
         font-size: 1.3em;
         background-color: $first-color;
         border-radius: 25px;
+        padding: 0 4px 0 8px;
       }
       @include xl {
         font-size: 3em;
@@ -535,6 +536,7 @@ nav {
     
     .restaurant-img {
       display: block;
+      background-color: #252831;
       margin: 0;
       width: 100%;
       max-width: 100%;

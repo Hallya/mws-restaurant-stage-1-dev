@@ -2,13 +2,14 @@
 
 const gulp = require('gulp');
 const browserify = require('gulp-bro');
+let uglify = require('gulp-uglify-es').default;
 const connect = require('gulp-connect');
 const htmlmin = require('gulp-htmlmin');
 const babelify = require('babelify');
 const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const browserSync = require('browser-sync').create();
-const uglify = require('gulp-uglify');
+// const uglify = require('gulp-uglify');
 const gutil = require('gulp-util');
 const babel = require('gulp-babel');
 const sourcemaps = require('gulp-sourcemaps');
@@ -44,45 +45,26 @@ gulp.task('dist', ['styles', 'copy-html', 'scripts-dist', 'copy-data', 'copy-man
 
 gulp.task('scripts', (done) => {
   gulp.src(['dev/js/main.js', 'dev/js/restaurant_info.js'])
-    .pipe(browserify({
-      transform: [
-        babelify.configure({ presets: ['es2015'] })
-      ]
-    }))
+    .pipe(browserify())
     .pipe(gulp.dest('dist/js'));
   gulp.src('dev/sw.js')
-    .pipe(browserify({
-      transform: [
-        babelify.configure({ presets: ['es2015'] })
-      ]
-    })) 
+    .pipe(browserify())
     .pipe(gulp.dest('dist'));
   connect.reload();
     done();
   });
   
-  gulp.task('scripts-dist', (done) => {
-    gulp.src(['dev/js/main.js', 'dev/js/restaurant_info.js'])
-      .pipe(browserify({
-        transform: [
-          babelify.configure({ presets: ['es2015'] }),
-          ['uglifyify', { global: true, sourceMap: false }]
-        ]
-      }))
-      .pipe(uglify())
-      .pipe(uglify())
-      .pipe(uglify())
-      .pipe(gulp.dest('dist/js'));
+gulp.task('scripts-dist', (done) => {
+  gulp.src(['dev/js/main.js', 'dev/js/restaurant_info.js'])  
+    .pipe(browserify())
+    .pipe(uglify())
+    .pipe(gulp.dest('dist/js'));
     gulp.src('dev/sw.js')
-      .pipe(browserify({
-        transform: [
-          babelify.configure({ presets: ['es2015'] }),
-          ['uglifyify', { global: true, sourceMap: false }]
-        ]
-      }))
-      .pipe(gulp.dest('dist'));
-    connect.reload();
-    done();
+    .pipe(browserify())
+    .pipe(uglify())
+    .pipe(gulp.dest('dist'));
+  connect.reload();
+  done();
 });
 
 gulp.task('copy-html', () => {

@@ -1,6 +1,6 @@
-/* global DBHelper */
-import DBHelper from './dbhelper';
-import Launch from './helpers';
+const DBHelper = require('./dbhelper');
+const Launch = require('./helpers');
+
 var restaurant;
 var map;
 
