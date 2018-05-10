@@ -1,84 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,minimal-ui">
-    <meta name="theme-color" content="#252831" />
-    <meta name="description" content="Restaurants reviews from food lovers">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="#252831">
-    <link rel="preload" href="https://fonts.googleapis.com/css?family=Montserrat|Righteous" as="font">
-    <link rel="preload" href="assets/css/index.css" as="style">
-    <link rel="preload" href="assets/img/svg/map-loader.svg" as="image">
-    <link rel="preload" href="assets/img/svg/puff.svg" as="image">
-    <link rel="prefetch" href="restaurant.html"> 
-    <link rel="preload" href="assets/css/fonts/JTURjIg1_i6t8kCHKm45_ZpC3gnD_vx3rCs.woff2" as="font">
-    <!--
-      <link rel="preload" href="assets/css/fonts/iconicfill.woff2" as="font">
-      <link rel="preload" href="assets/css/fonts/1cXxaUPXBpj2rGoU7C9WiHGFq8Kk1Q.woff2" as="font">
-    -->
-    <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-ipad-9.7.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait)" sizes="1536x2048">
-    <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-ipadpro-10.5.png" media="(device-width: 1112px) and (device-height: 834px) and (orientation: portrait)" sizes="1668×2224">
-    <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-ipadpro-12.9.png" media="(device-width: 1024px) and (device-height: 1366px) and (orientation: portrait)" sizes="2048x2732">
-    <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-iphone-8.png" media="(device-width: 375px) and (device-height: 667px) and (orientation: portrait)" sizes="750×1334">
-    <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-iphone-8plus.png" media="(device-width: 414px) and (device-height: 736px) and (orientation: portrait)" sizes="1242×2208">
-    <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-iphone-x.png" media="(device-width: 375px) and (device-height: 812px) and (orientation: portrait)" sizes="1125×2436">
-    <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-iphone-se.png" media="(device-width: 320px) and (device-height: 568px) and (orientation: portrait)" sizes="640×1136">
-    <link rel="apple-touch-icon" type="image/png" href="assets/img/png/logo-64.png"sizes="64x64"/>
-    <link rel="apple-touch-icon" type="image/png" href="assets/img/png/logo-128.png"sizes="128x128"/>
-    <link rel="apple-touch-icon" type="image/png" href="assets/img/png/logo-256.png"sizes="256x256"/>
-    <link rel="apple-touch-icon" type="image/png" href="assets/img/png/logo-512.png"sizes="512x512"/>
-    <link rel="icon" type="image/png" href="assets/img/png/logo-64.png"sizes="64x64"/>
-    <link rel="icon" type="image/png" href="assets/img/png/logo-128.png"sizes="128x128"/>
-    <link rel="icon" type="image/png" href="assets/img/png/logo-256.png"sizes="256x256"/>
-    <link rel="icon" type="image/png" href="assets/img/png/logo-512.png"sizes="512x512"/>
-    <link rel="stylesheet" href="assets/css/index.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat|Righteous">
-    <link rel="image" href="assets/img/svg/map-loader.svg">
-    <link rel="image" href="assets/img/svg/puff.svg">
-    <link rel="manifest" href="manifest.webmanifest">
-    <title>Restaurant Reviews</title>
-  </head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,minimal-ui">
+  <meta name="theme-color" content="#252831" />
+  <meta name="description" content="Restaurants reviews from food lovers">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#252831">
+  <link rel="preload" href="assets/css/index.css" as="style">
+  <link rel="preload" href="assets/img/svg/map-loader.svg" as="image">
+  <link rel="preload" href="assets/img/svg/puff.svg" as="image">
+  <link rel="prefetch" href="restaurant.html">
+  <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-ipad-9.7.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait)"
+    sizes="1536x2048">
+  <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-ipadpro-10.5.png" media="(device-width: 1112px) and (device-height: 834px) and (orientation: portrait)"
+    sizes="1668×2224">
+  <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-ipadpro-12.9.png" media="(device-width: 1024px) and (device-height: 1366px) and (orientation: portrait)"
+    sizes="2048x2732">
+  <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-iphone-8.png" media="(device-width: 375px) and (device-height: 667px) and (orientation: portrait)"
+    sizes="750×1334">
+  <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-iphone-8plus.png" media="(device-width: 414px) and (device-height: 736px) and (orientation: portrait)"
+    sizes="1242×2208">
+  <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-iphone-x.png" media="(device-width: 375px) and (device-height: 812px) and (orientation: portrait)"
+    sizes="1125×2436">
+  <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-iphone-se.png" media="(device-width: 320px) and (device-height: 568px) and (orientation: portrait)"
+    sizes="640×1136">
+  <link rel="apple-touch-icon" type="image/png" href="assets/img/png/logo-64.png" sizes="64x64" />
+  <link rel="apple-touch-icon" type="image/png" href="assets/img/png/logo-128.png" sizes="128x128" />
+  <link rel="apple-touch-icon" type="image/png" href="assets/img/png/logo-256.png" sizes="256x256" />
+  <link rel="apple-touch-icon" type="image/png" href="assets/img/png/logo-512.png" sizes="512x512" />
+  <link rel="icon" type="image/png" href="assets/img/png/logo-64.png" sizes="64x64" />
+  <link rel="icon" type="image/png" href="assets/img/png/logo-128.png" sizes="128x128" />
+  <link rel="icon" type="image/png" href="assets/img/png/logo-256.png" sizes="256x256" />
+  <link rel="icon" type="image/png" href="assets/img/png/logo-512.png" sizes="512x512" />
+  <link rel="stylesheet" href="assets/css/index.css" charset="utf-8" type="text/css">
+  <link rel="image" href="assets/img/svg/map-loader.svg">
+  <link rel="image" href="assets/img/svg/puff.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+   
+  </style>
+  <title>Restaurant Reviews</title>
+</head>
 
-  <body>
-    <header>
-      <nav>
-        <h1><a href="index.html" >Restaurant Reviews</a></h1>
-        <button id="menuFilter" class="iconicfill-equalizer" role="button" aria-labelledby="filtersSettings"></button>
-        <label id="filtersSettings" hidden>Filter settings</label>
-      </nav>
-      <div class="filter-options optionsClose" role="menu" aria-hidden="true">
-        <h3 id="filters" aria-label="filter results"></h3>
-        <label id="location" hidden>Choose your location</label>
-        <select id="neighborhoods-select" aria-labelledby="location"  name="neighborhoods">
-          <option value="all" role="option" aria-setsize="4" aria-posinset="1">All Neighborhoods</option>
-        </select>
-        <label id="cuisines" hidden>Choose your type of food</label>
-        <select id="cuisines-select" aria-labelledby="cuisines" name="cuisines">
-          <option value="all" role="option" aria-setsize="4" aria-posinset="1">All Cuisines</option>
-        </select>
-      </div>
-    </header>
-    
-    <main id="maincontent">
-      <a href="#list-container" aria-label="Skip to the list of restaurant" role="link"></a>
-      
-      <section id="map-container" aria-label="map" role="application">
-        <aside id="map-loader">
-          <img src="assets/img/svg/map-loader.svg" height="100%" width="100%">
-        </aside>
-      </section>
-      
-      <section id="list-container" aria-label="list of restaurants">
-        <ul id="restaurants-list" role="list"></ul>
-      </section>
-      
-    </main>
-    <footer id="footer">
-      Copyright (c) 2017 <a href="index.html"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
-    </footer>
-    <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhh8UfYBFgAt3jlejXNTbrAuCnJqQtIPc&libraries=places&callback=initMap"></script>
-  </body>
+<body>
+  <header>
+    <nav>
+      <h1>
+        <a href="index.html">Restaurant Reviews</a>
+      </h1>
+      <button id="menuFilter" class="iconicfill-equalizer" role="button" aria-labelledby="filtersSettings"></button>
+      <label id="filtersSettings" hidden>Filter settings</label>
+    </nav>
+    <div class="filter-options optionsClose" role="menu" aria-hidden="true">
+      <h3 id="filters" aria-label="filter results"></h3>
+      <label id="location" hidden>Choose your location</label>
+      <select id="neighborhoods-select" aria-labelledby="location" name="neighborhoods">
+        <option value="all" role="option" aria-setsize="4" aria-posinset="1">All Neighborhoods</option>
+      </select>
+      <label id="cuisines" hidden>Choose your type of food</label>
+      <select id="cuisines-select" aria-labelledby="cuisines" name="cuisines">
+        <option value="all" role="option" aria-setsize="4" aria-posinset="1">All Cuisines</option>
+      </select>
+    </div>
+  </header>
+
+  <main id="maincontent">
+    <a href="#list-container" aria-label="Skip to the list of restaurant" role="link"></a>
+
+    <section id="map-container" aria-label="map" role="application">
+      <aside id="map-loader">
+        <img src="assets/img/svg/map-loader.svg" height="100%" width="100%">
+      </aside>
+    </section>
+
+    <section id="list-container" aria-label="list of restaurants">
+      <ul id="restaurants-list" role="list"></ul>
+    </section>
+
+  </main>
+  <footer id="footer">
+    Copyright (c) 2017
+    <a href="index.html">
+      <strong>Restaurant Reviews</strong>
+    </a> All Rights Reserved.
+  </footer>
+  <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhh8UfYBFgAt3jlejXNTbrAuCnJqQtIPc&libraries=places&callback=initMap"></script>
+</body>
+
 </html>
