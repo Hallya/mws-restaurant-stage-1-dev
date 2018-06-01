@@ -1,4 +1,4 @@
-const idb = require('../node_modules/idb/lib/idb');
+const idb = require('../../node_modules/idb/lib/idb');
 
 const openDatabase = () => {
   if (!navigator.serviceWorker) return;

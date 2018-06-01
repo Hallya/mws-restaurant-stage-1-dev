@@ -58,6 +58,10 @@
     "gulp-uglify-es": "^1.0.1",
     "gulp-util": "^3.0.8",
     "gulp-webp": "^3.0.0",
-    "uglifyify": "^4.0.5"
+    "uglifyify": "^4.0.5",
+    "window-or-global": "^1.0.1"
+  },
+  "dependencies": {
+    "idb": "^2.1.2"
   }
 }

@@ -4,6 +4,8 @@ const Launch = require('./helpers');
 var restaurant;
 var map;
 
+const mapLoader = document.getElementById('map-loader');
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     const pathToServiceWorker = window.location.hostname === 'hallya.github.io' ? '/mws-restaurant-stage-1/sw.js' : '../sw.js'
@@ -23,11 +25,15 @@ window.initMap = () => {
       self.map = new google.maps.Map(mapPlaceHolder, {
         zoom: 16,
         center: restaurant.latlng,
-        scrollwheel: false
+        streetViewControl: false,
+        mapTypeId: 'roadmap',
+        mapTypeControl: false,
       })
       document.getElementById('map-container').appendChild(mapPlaceHolder);
       self.map.addListener('tilesloaded', function () {
-        document.getElementById('map-loader').remove();
+        // if (mapLoader.classList.contains('hidden'){
+          mapLoader.classList.toggle('hidden');
+        // }
       });
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
       fillBreadcrumb();
@@ -71,13 +77,13 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   
   const sourceWebp = document.createElement('source');
   sourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-large_x1.webp 1x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-large_x2.webp 2x`;
-  sourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-lazy.webp`;
+  sourceWebp.srcset = 'assets/img/svg/puff.svg';
   sourceWebp.className = 'lazy';
   sourceWebp.media = '(min-width: 1000px)';
   sourceWebp.type = 'image/webp';
   const source = document.createElement('source');
   source.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-large_x2.jpg 2x`;
-  source.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  source.srcset = 'assets/img/svg/puff.svg';
   source.className = 'lazy';
   source.media = sourceWebp.media;
   source.type = 'image/jpeg';
@@ -85,26 +91,26 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   
   const ndSourceWebp = document.createElement('source');
   ndSourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-medium_x1.webp 1x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-medium_x2.webp 2x`;
-  ndSourceWebp.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  ndSourceWebp.srcset = 'assets/img/svg/puff.svg';
   ndSourceWebp.className = 'lazy';
   ndSourceWebp.media = '(min-width: 420px)';
   ndSourceWebp.type = 'image/webp';
   const ndSource = document.createElement('source');
   ndSource.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x2.jpg 2x`;
-  ndSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  ndSource.srcset = 'assets/img/svg/puff.svg';
   ndSource.className = 'lazy';
   ndSource.media = ndSourceWebp.media;
   ndSource.type = 'image/jpeg';
   
   const thSourceWebp = document.createElement('source');
   thSourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-small_x2.webp 2x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-small_x1.webp 1x`;
-  thSourceWebp.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  thSourceWebp.srcset = 'assets/img/svg/puff.svg';
   thSourceWebp.className = 'lazy';
   thSourceWebp.media = '(min-width: 320px)';
   thSourceWebp.type = 'image/webp';
   const thSource = document.createElement('source');
   thSource.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-small_x2.jpg 2x, ${DBHelper.imageUrlForRestaurant(restaurant)}-small_x1.jpg 1x`;
-  thSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  thSource.srcset = 'assets/img/svg/puff.svg';
   thSource.className = 'lazy';
   thSource.media = thSourceWebp.media;
   thSource.type = 'image/jpeg';
@@ -112,7 +118,7 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   const image = document.createElement('img');
   image.className = 'restaurant-img lazy';
   image.dataset.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg`;
-  image.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
+  image.src = 'assets/img/svg/puff.svg';
   image.setAttribute('sizes', '(max-width: 1100px) 85vw, (min-width: 1101px) 990px');
   image.alt = `${restaurant.name}'s  restaurant`;
   image.type = 'image/jpeg';
@@ -125,12 +131,15 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   picture.appendChild(thSource);
   picture.appendChild(image);
   figure.insertBefore(picture, figcaption);
+
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
+
   const labelFoodType = document.createElement('label');
   labelFoodType.innerHTML = `${restaurant.cuisine_type} food`;
   labelFoodType.setAttribute('hidden', 'hidden');
   labelFoodType.id = 'foodType';
+
   cuisine.parentNode.insertBefore(labelFoodType, cuisine.nextSibling);
 
   // fill operating hours
@@ -170,9 +179,26 @@ const fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hour
  */
 const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const container = document.getElementById('reviews-container');
+  const titleContainer = document.createElement('div');
   const title = document.createElement('h3');
+  const addReview = document.createElement('button');
+  const addContent = document.createElement('span');
+  const deleteContent = document.createElement('span');
+
   title.innerHTML = 'Reviews';
-  container.appendChild(title);
+  addContent.innerHTML = "+";
+  deleteContent.innerHTML = "-";
+  deleteContent.className = "toggled";
+  titleContainer.id = "title-container";
+
+  addReview.addEventListener('click', showForm);
+  addReview.appendChild(addContent);
+  addReview.appendChild(deleteContent);
+
+  titleContainer.appendChild(title);
+  titleContainer.appendChild(addReview);
+
+  container.appendChild(titleContainer);
 
   if (!reviews) {
     const noReviews = document.createElement('p');
@@ -187,6 +213,112 @@ const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   container.appendChild(ul);
 };
 
+const showForm = () => {
+
+  const form = document.createElement('form');
+  const labelNameInput = document.createElement('label');
+  const nameInput = document.createElement('input');
+  const ratingFieldset = document.createElement('fieldset');
+  const appreciation = ['excellent', 'good', 'ok', 'bad', 'awful'];
+  
+  form.autocomplete = 'on';
+
+  nameInput.id = 'form-name';
+  nameInput.type = 'text';
+  nameInput.name = 'name';
+  nameInput.placeholder = 'Your name';
+  nameInput.minLength = '2';
+  nameInput.maxLength = '50';
+  nameInput.pattern = '^[a-zA-Z\s]+$';
+  nameInput.required = true;
+
+  labelNameInput.setAttribute('for', nameInput.id);
+  labelNameInput.className = "visuallyHidden";
+  labelNameInput.innerHTML = "Enter your name";
+  
+  ratingFieldset.className = 'new-rating';
+
+  for (let i = 5; i > 0; i--){
+
+    const starInput = document.createElement('input');
+    const starLabel = document.createElement('label');
+    
+    starInput.type = 'radio';
+    starInput.id = `star${i}`;
+    starInput.name = 'rating';
+    starInput.value = i;
+    starInput.class = 'visuallyHidden';
+    starInput.required = true;
+    starInput.addEventListener('input', Launch.isFormValid);
+    
+    starLabel.setAttribute('for', `star${i}`);
+    starLabel.title = 'It was', appreciation[i - 1];
+    
+
+    ratingFieldset.appendChild(starInput);
+    ratingFieldset.appendChild(starLabel);
+  }
+  
+  const labelCommentsInput = document.createElement('label');
+  const commentsInput = document.createElement('textarea');
+  const labelSubmitButton = document.createElement('label');
+  const submitButton = document.createElement('input');
+  const submitImage = document.createElement('img');
+
+  commentsInput.id = 'form-comment';
+  commentsInput.name = 'comments';
+  commentsInput.type = 'text';
+  commentsInput.required = true;
+  commentsInput.minLength = 3;
+  commentsInput.maxLength = 5000;
+  commentsInput.placeholder = 'Your comment';
+  commentsInput.addEventListener('keydown', autosize);
+
+  
+  labelCommentsInput.setAttribute('for', commentsInput.id);
+  labelCommentsInput.className = 'visuallyHidden';
+  labelCommentsInput.innerHTML = 'Enter your opinion about this restaurant';
+
+  submitButton.id = 'form-submit';
+  submitButton.type = 'submit';
+  submitButton.value = 'Save';
+
+  labelSubmitButton.setAttribute('for', submitButton.id);
+  labelSubmitButton.className = 'visuallyHidden';
+
+  nameInput.addEventListener('change', Launch.isFormValid);
+  commentsInput.addEventListener('input', Launch.isFormValid);
+
+  form.appendChild(labelNameInput);
+  form.appendChild(nameInput);
+  form.appendChild(ratingFieldset);
+  form.appendChild(labelCommentsInput);
+  form.appendChild(commentsInput);
+  form.appendChild(submitButton);
+  form.appendChild(labelSubmitButton);
+
+  form.addEventListener('submit', DBHelper.postReview);
+
+  document.getElementById('title-container').style.height = '300px';
+  document.getElementById('title-container').appendChild(form);
+  form.classList.toggle('form-toggled');
+  setTimeout(() => {
+  }, 300)
+  document.querySelector('#title-container button').removeEventListener('click', showForm);
+  document.querySelector('#title-container button').addEventListener('click', hideForm);
+  document.querySelectorAll('#title-container button span').forEach(span => span.classList.toggle('toggled'))
+}
+
+const hideForm = () => {
+  document.querySelector('#title-container form').classList.toggle('form-toggled');
+  setTimeout(() => {
+    document.querySelector('#title-container form').remove();
+  }, 300)
+  document.querySelectorAll('#title-container button span').forEach(span => span.classList.toggle('toggled'))
+  document.getElementById('title-container').style.height = '50px';
+  document.querySelector('#title-container button').removeEventListener('click', hideForm);
+  document.querySelector('#title-container button').addEventListener('click', showForm);
+}
 /**
  * Create review HTML and add it to the webpage.
  */
@@ -209,7 +341,10 @@ const createReviewHTML = (review) => {
   rating.className = 'userRating';
   stars.className = 'ratingStars';
   for (let i = 0; i < review.rating; i++) {
-    stars.innerHTML += '★';
+    const star = document.createElement('span');
+    star.innerHTML += '★';
+    star.id = `star${i + 1}`
+    stars.appendChild(star);
   }
   stars.setAttribute('aria-label', `${review.rating} stars on 5,`);
   rating.innerHTML = 'Rating: ';
@@ -254,3 +389,11 @@ const getParameterByName = (name, url) => {
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 };
+
+
+function autosize() {
+  const el = this;
+  document.getElementById('title-container').style.height = 'auto';
+  el.style.cssText = 'height:auto; padding:0';
+  el.style.cssText = 'height:' + el.scrollHeight + 'px';
+}

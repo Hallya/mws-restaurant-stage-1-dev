@@ -16,10 +16,7 @@
   font-family: 'menusetting';
   src: url('fonts/iconicfill.woff2') format('woff2'),
 }
-@font-face {
-  font-family: "breadcrumb";
-  src: url('fonts/fontawesome.woff2') format('woff2');
-}
+
 $screen-s-min: 320px;
 $screen-m-min: 550px;
 $screen-l-min: 1000px;
@@ -55,12 +52,6 @@ $background-secondary-color: #252831;
   }
 }
 
-
-[class*="fontawesome-"]:before {
-  content: '\f061';
-  font-family: 'breadcrumb', sans-serif;
-  color: $background-primary-color;
-}
 .iconicfill-equalizer:before {
   content: '\e052';
   font-family: 'menusetting', sans-serif;
@@ -94,15 +85,22 @@ body {
     z-index: -1;
   }
 
-  .moveDown {
+  main {
     @include m {
-      transform: translateY(7.5em);
-    }
-  }
-  .moveUp {
-    @include m {
+      will-change: transform;
       transform: translateY(0em);
     }
+  }
+  footer {
+    @include m {
+      will-change: transform;
+      transform: translateY(0em);
+    }
+  }
+}
+.moveDown {
+  @include m {
+    transform: translateY(7.5em);
   }
 }
 
@@ -186,36 +184,6 @@ header {
   @include xl {
     height: 8em;
   }
-  #breadcrumb {
-    list-style: none;
-    background-color:$background-secondary-color;
-    height: 30%;
-    width: 100%;
-    @include xl {
-      font-size: 1.3em;
-    }
-    li {
-      display: inline;
-      color: $background-primary-color;
-      font-size: 1em;
-      font-family: 'Montserrat', sans-serif;
-      padding-right: 5px;
-      @include m {
-        font-size: 1.5em;
-      }
-      /* Add a color to all links the list */
-      a {
-        color: #f58301;
-        text-decoration: none;
-        /* Add a color on mouse-over */
-        a:hover {
-          color: #01447e;
-          text-decoration: underline;
-        }
-      }
-      /* Add a slash symbol (/) before/behind each list item */
-    }
-  }
 }
 
 main {
@@ -237,6 +205,7 @@ main {
   aside.popup {
     display: none;
     transition: 0.2s;
+    will-change: transform;
     @include mobile {
       
       display: flex;
@@ -383,14 +352,17 @@ nav {
   text-align: center;
   width: 75vw;
   overflow: hidden;
-  border-bottom: 3px solid #35b7ab;
+  border-bottom: 3px solid #ff0404;
   border-bottom-left-radius: 25px;
   border-bottom-right-radius: 25px;
-  // background$first-color;
   background: linear-gradient(to bottom, #a50000 10%, $first-color 100%);
-  transition: 0.4s ease-in-out;
-  
+  transition: 0.3s ease-in-out;
+  will-change: transform;
+  transform: translate3d(-1em, -22em, 0);
+  visibility: hidden;
+  opacity: 0;
   @include m {
+    transform: translateY(-7.5em);
     height: 4em;
     width: 100vw;
     z-index: 0;
@@ -430,17 +402,6 @@ nav {
   }
 }
 
-.optionsClose {
-  transform: translate3d(-1em, -22em, 0);
-  visibility: hidden;
-  opacity: 0;
-  @include m {
-    transform: translateY(-7.5em);
-  }
-}
-
-
-
 /* ====================== Map ====================== */
 
 #map-container {
@@ -478,16 +439,23 @@ nav {
     height: 100%;
     position: absolute;
     z-index: 1;
+    transition: 0.1s;
     background-color: $background-secondary-color;
     @include m {
       border-radius: 25px;
     }
+     #loader {
+       height: 50%;
+       width: 100%;
+       position: absolute;
+       top: 25%;
+     }
   }
   .hidden {
-    display: none;
+    opacity: 0;
   }
   .notHidden {
-    display: inherit;
+    opacity: 1;
   }
 }
 

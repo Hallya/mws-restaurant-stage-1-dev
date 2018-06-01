@@ -45,7 +45,7 @@ const DBHelper = {
           return fetch(DBHelper.DATABASE_URL())
             .then(response => response.json())
             .then(data => {
-              const restaurant = data[id - 1];
+              const restaurant = data.find(restaurant => restaurant.id === Number(id));
               idbKey.set(store, restaurant);
               return restaurant;
             })
@@ -110,32 +110,23 @@ const DBHelper = {
   /**
    * Fetch all neighborhoods with proper error handling.
    */
-  fetchNeighborhoods: () => {
-    // Fetch all restaurants
-    return DBHelper.fetchRestaurants()
-      .then(restaurants => {
-        // Get all neighborhoods from all restaurants
-        const neighborhoods = restaurants.map(restaurant => restaurant.neighborhood);
-        // Remove duplicates from neighborhoods
-        const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i);
-        return uniqueNeighborhoods;
-      })
-      .catch(error => console.error(error));
+  fetchNeighborhoods: (restaurants) => {
+    // Get all neighborhoods from all restaurants
+    const neighborhoods = restaurants.map(restaurant => restaurant.neighborhood);
+    // Remove duplicates from neighborhoods
+    const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i);
+    return uniqueNeighborhoods;
   },
 
   /**
    * Fetch all cuisines with proper error handling.
    */
-  fetchCuisines: () => {
-    // Fetch all restaurants
-    return DBHelper.fetchRestaurants()
-      .then(restaurants => {
-        // Get all cuisines from all restaurants
-        const cuisines = restaurants.map(restaurant => restaurant.cuisine_type);
-        // Remove duplicates from cuisines
-        const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i);
-        return uniqueCuisines;
-      }).catch(error => console.error(error));
+  fetchCuisines: (restaurants) => {
+    // Get all cuisines from all restaurants
+    const cuisines = restaurants.map(restaurant => restaurant.cuisine_type);
+    // Remove duplicates from cuisines
+    const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i);
+    return uniqueCuisines;
   },
 
   /**
@@ -155,8 +146,21 @@ const DBHelper = {
   imageWebpUrlForRestaurant: (restaurant) => {
     return (`assets/img/webp/${restaurant.photograph}`);
   },
-
-  /**q
+  postReview: (e) => {
+    e.preventDefault();
+    const form = document.querySelector('#title-container form').elements;
+    const body = {
+      "restaurant_id": window.location.search.match(/\d+/)[0],
+      "name": form["name"].value,
+      "rating": form["rating"].value,
+      "comments": form["comments"].value
+    }
+    fetch('http://localhost:1337/reviews/', {
+      method: "POST",
+      body: body
+    }).then(response => console.log(response));
+  },
+  /**
    * Map marker for a restaurant.
    */
   mapMarkerForRestaurant: (restaurant, map) => {
@@ -165,7 +169,8 @@ const DBHelper = {
       title: restaurant.name,
       url: DBHelper.urlForRestaurant(restaurant),
       map: map,
-      animation: google.maps.Animation.DROP
+      animation: google.maps.Animation.DROP,
+      icon: '/assets/img/svg/marker.svg'
     });
     return marker;
   }

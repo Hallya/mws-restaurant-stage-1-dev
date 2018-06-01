@@ -9,6 +9,7 @@ let loading = false;
 let markers = [];
 let cuisine;
 let neighborhood;
+let sort;
 
 const mainContent = document.querySelector('main'),
   footer = document.querySelector('footer'),
@@ -20,73 +21,58 @@ const mainContent = document.querySelector('main'),
   sectionMap = document.getElementById('#map-container'),
   neighborhoodsSelect = document.querySelector('#neighborhoods-select'),
   cuisinesSelect = document.querySelector('#cuisines-select'),
+  sortSelect = document.querySelector('#sort-select'),
   mapDiv = document.querySelector('#map'),
   loader = document.querySelector('#map-loader');
+
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', () => {
-  if (
-    !window.navigator.standalone
-    && (window.navigator.userAgent.indexOf('Android') === -1
-      && window.navigator.userAgent.indexOf('Linux') === -1)
-  ) {
-    addBannerToHomeScreen();
-  }
-  cuisinesSelect.addEventListener('change', updateRestaurants);
-  neighborhoodsSelect.addEventListener('change', updateRestaurants);
-  fetchNeighborhoods()
+  updateRestaurants()
+    .then(addSortOptions)
     .then(fetchCuisines)
-    .then(updateRestaurants)
-    .catch(error => console.error(error))
+    .then(fetchNeighborhoods)
+    .catch(error => console.error(error));
+  // fetchCuisines();
+  // fetchNeighborhoods();
 });
 
 
+filterButton.addEventListener('click', toggleMenu);
 /**
  * Open or close the options/filter menu.
  */
-filterButton.addEventListener('click', () => {
-  if (filterOptions.classList.contains('optionsClose')) {
-    openMenu();
-  } else {
-    closeMenu();
-  }
-});
-function openMenu() {
-  filterOptions.classList.remove('optionsClose');
-  mainContent.classList.remove('moveUp');
-  footer.classList.remove('moveUp');
-  filterOptions.classList.add('optionsOpen');
+function toggleMenu() {
+  filterOptions.classList.toggle('optionsOpen');
+  mainContent.classList.toggle('moveDown');
+  footer.classList.toggle('moveDown');
+  filterButton.classList.toggle('pressed');
   filterOptions.setAttribute('aria-hidden', 'false');
-  mainContent.classList.add('moveDown');
-  footer.classList.add('moveDown');
-  filterButton.classList.add('pressed');
   filterButton.blur();
   filterResultHeading.setAttribute('tabindex', '-1');
   filterResultHeading.focus();
 }
-function closeMenu() {
-  filterOptions.classList.remove('optionsOpen');
-  filterOptions.classList.add('optionsClose');
-  filterOptions.setAttribute('aria-hidden', 'true');
-  filterButton.classList.remove('pressed');
-  mainContent.classList.remove('moveDown');
-  mainContent.classList.add('moveUp');
-  footer.classList.remove('moveDown');
-  footer.classList.add('moveUp');
-  filterResultHeading.removeAttribute('tabindex');
-}
-
 
 /**
  * Register to service worker if the browser is compatible.
  */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
+window.addEventListener('load', () => {
+  if ('serviceWorker' in navigator) {
     const pathToServiceWorker = window.location.hostname === 'hallya.github.io' ? '/mws-restaurant-stage-1/sw.js' : '../sw.js'
     navigator.serviceWorker.register(pathToServiceWorker).then(registration => console.log('registration to serviceWorker complete with scope :', registration.scope));
-  });
-}
+  }
+  if (!window.navigator.standalone && (window.navigator.userAgent.indexOf('Android') === -1 && window.navigator.userAgent.indexOf('Linux') === -1)) {
+    addBannerToHomeScreen();
+  }
+  // if (window.navigator.userAgent.indexOf('Android') > -1 || window.navigator.userAgent.indexOf('iPhone') > -1) {
+  //   launch.lazyMap()
+  // }
+  cuisinesSelect.addEventListener('change', updateRestaurants);
+  neighborhoodsSelect.addEventListener('change', updateRestaurants);
+  sortSelect.addEventListener('change', updateRestaurants);
+  
+});
 
 
 /**
@@ -95,21 +81,25 @@ if ('serviceWorker' in navigator) {
 document.onkeypress = function (e) {
   if (e.charCode === 13 && filterOptions.classList.contains('optionsOpen')) {
     closeMenu();
-    listOfRestaurants.setAttribute('tabindex', '0');
+    listOfRestaurants.setAttribute('tabindex', '-1');
     listOfRestaurants.focus();
+    document.getElementById('skip').click();
     // window.scrollTo(0, sectionMap.clientHeight*2);
   }
 };
 /**
  * Fetch all neighborhoods and set their HTML.
  */
-const fetchNeighborhoods = () => {
-  return DBHelper.fetchNeighborhoods()
-    .then(neighborhoods => {
-      self.neighborhoods = neighborhoods;
-      fillNeighborhoodsHTML();
-    })
-    .catch(error => console.error(error));
+const fetchNeighborhoods = (restaurants = self.restaurants) => {
+  self.neighborhoods = DBHelper.fetchNeighborhoods(restaurants);
+  fillNeighborhoodsHTML();
+};
+/**
+ * Fetch all cuisines and set their HTML.
+ */
+const fetchCuisines = (restaurants = self.restaurants) => {
+  self.cuisines = DBHelper.fetchCuisines(restaurants);
+  fillCuisinesHTML();
 };
 
 /**
@@ -127,18 +117,6 @@ const fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
     select.append(option);
   });
 };
-/**
- * Fetch all cuisines and set their HTML.
- */
-const fetchCuisines = () => {
-  DBHelper.fetchCuisines()
-    .then(cuisines => {
-      self.cuisines = cuisines;
-      fillCuisinesHTML();
-    })
-    .catch(error => console.error(error));
-};
-
 /**
  * Set cuisines HTML.
  */
@@ -168,15 +146,16 @@ window.initMap = () => {
     lng: -73.987501
   };
   self.map = new google.maps.Map(mapPlaceHolder, {
-    zoom: 12,
     center: loc,
-    scrollwheel: false
+    zoom: 12,
+    streetViewControl: false,
+    mapTypeId: 'roadmap',
+    mapTypeControl: false,
   });
   document.getElementById('map-container').appendChild(mapPlaceHolder);
   self.map.addListener('tilesloaded', function () {
     loader.remove();
-    updateRestaurants()
-      .then(addMarkersToMap)
+    addMarkersToMap();
   });
 };
 
@@ -186,21 +165,26 @@ window.initMap = () => {
 const updateRestaurants = () => {
   const cSelect = cuisinesSelect;
   const nSelect = neighborhoodsSelect;
+  const sSelect = sortSelect;
 
   const cIndex = cSelect.selectedIndex;
   const nIndex = nSelect.selectedIndex;
+  const sIndex = sSelect.selectedIndex;
 
-  if (cuisine === cSelect[cIndex].value && neighborhood === nSelect[nIndex].value) {
+  if (cuisine === cSelect[cIndex].value
+    && neighborhood === nSelect[nIndex].value
+    && sort === sSelect[sIndex].value) {
+    
     console.log('- Restaurants list already update');
     return Promise.resolve();
   }
   cuisine = cSelect[cIndex].value;
   neighborhood = nSelect[nIndex].value;
-
+  sort = sSelect[sIndex].value;
   return DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
     .then(resetRestaurants)
-    .then(fillRestaurantsHTML)
-    .then(launch.lazyLoading)
+    .then(sortRestaurantsBy)
+    .then(generateRestaurantsHTML)
     .then(() => console.log('- Restaurants list updated !'))
     .catch(error => console.error(error))
 };
@@ -220,28 +204,84 @@ const resetRestaurants = (restaurants) => {
   }
   self.markers = [];
   self.restaurants = restaurants;
+  return restaurants;
 };
 
+const addSortOptions = () => {
+  sortOptions = ['Note', 'A-Z', 'Z-A'];
+  sortOptions.forEach(sortOption => {
+    const option = document.createElement('option');
+    option.innerHTML = sortOption;
+    option.value = sortOption;
+    option.setAttribute('role', 'option');
+    option.setAttribute('aria-setsize', '4');
+    option.setAttribute('aria-posinset', sortOptions.indexOf(sortOption) + 2);
+    sortSelect.append(option);
+  });
+}
+
+const sortRestaurantsBy = (restaurants = self.restaurants) => {
+  const sIndex = sortSelect.selectedIndex;
+  switch (sortSelect[sIndex].value) {
+    case 'Relevant':
+      return restaurants;
+      break;
+    case 'Note':
+      return restaurants.sort(launch.sortByNote)
+      break;
+    case 'A-Z':
+      return restaurants.sort(launch.sortByName);
+      break;
+    case 'Z-A':
+      return restaurants.sort(launch.sortByNameInverted);
+      break;
+  }
+}
 /**
  * Create all restaurants HTML and add them to the webpage.
  */
-const fillRestaurantsHTML = (restaurants = self.restaurants) => {
-  const ul = document.getElementById('restaurants-list');
-  restaurants.forEach(restaurant => {
-    ul.append(createRestaurantHTML(restaurant));
-  });
-};
+function* restaurantGenerator(restaurants = self.restaurants) {
+  let i = 0
+  while (restaurants[i]) {
+    const restaurant = createRestaurantHTML(restaurants[i]);
+    yield restaurant;
+    i++;
+  }
+}
 
-/**
- * Return the average note of the restaurant.
- */
-const getAverageNote = (reviews) => {
-  let averageNote = 0;
-  reviews.forEach(review => {
-    averageNote = averageNote + Number(review.rating);
-  });
-  averageNote = averageNote / reviews.length;
-  return (Math.round(averageNote * 10)) / 10;
+const generateRestaurantsHTML = (restaurants = self.restaurants) => {
+  const ul = document.getElementById('restaurants-list');
+  restaurants.forEach(restaurant => ul.append(createRestaurantHTML(restaurant)));
+  return launch.lazyLoading();
+  // if ('IntersectionObserver' in window) {
+    
+  //   const options = {
+  //     root: null,
+  //     threshold: [0],
+  //     rootMargin: "600px"
+  //   }
+
+  //   let lazyRestaurantObserver = new IntersectionObserver(function (entries, observer) {
+      
+  //     entries.forEach(function (entry) {
+        
+  //       if (entry.isIntersecting) {
+          
+  //         lazyRestaurantObserver.unobserve(entry.target);
+          
+  //         const restaurant = pushRestaurants.next();
+  //         if (!restaurant.done) {
+  //           ul.append(restaurant.value);
+  //           lazyRestaurantObserver.observe(restaurant.value);
+  //           launch.lazyLoading()
+  //         }
+  //       }
+  //     });
+  //   }, options);
+
+  //   const pushRestaurants = restaurantGenerator()
+  //   lazyRestaurantObserver.observe(listOfRestaurants)
+  // }
 };
 
 /**
@@ -310,7 +350,7 @@ const createRestaurantHTML = (restaurant) => {
   image.alt = `${restaurant.name}'s restaurant`;
   image.type = 'image/jpeg';
   
-  note.innerHTML = `${getAverageNote(restaurant.reviews)}/5`;
+  note.innerHTML = `${launch.getAverageNote(restaurant.reviews)}/5`;
 
   containerNote.append(note);
 

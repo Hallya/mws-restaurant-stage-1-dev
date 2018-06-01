@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,minimal-ui">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#252831" />
   <meta name="description" content="Restaurants reviews from food lovers">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,6 +11,7 @@
   <link rel="preload" href="assets/css/index.css" as="style">
   <link rel="preload" href="assets/img/svg/map-loader.svg" as="image">
   <link rel="preload" href="assets/img/svg/puff.svg" as="image">
+  <link rel="preload" href="/assets/img/svg/marker.svg" as="image">
   <link rel="prefetch" href="restaurant.html">
   <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-ipad-9.7.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait)"
     sizes="1536x2048">
@@ -37,6 +38,7 @@
   <link rel="stylesheet" href="assets/css/index.css" charset="utf-8" type="text/css">
   <link rel="image" href="assets/img/svg/map-loader.svg">
   <link rel="image" href="assets/img/svg/puff.svg">
+  <link rel="image" href="/assets/img/svg/marker.svg">
   <link rel="manifest" href="manifest.webmanifest">
   <style>
    
@@ -53,7 +55,7 @@
       <button id="menuFilter" class="iconicfill-equalizer" role="button" aria-labelledby="filtersSettings"></button>
       <label id="filtersSettings" hidden>Filter settings</label>
     </nav>
-    <div class="filter-options optionsClose" role="menu" aria-hidden="true">
+    <div class="filter-options" role="menu" aria-hidden="true">
       <h3 id="filters" aria-label="filter results"></h3>
       <label id="location" hidden>Choose your location</label>
       <select id="neighborhoods-select" aria-labelledby="location" name="neighborhoods">
@@ -63,15 +65,19 @@
       <select id="cuisines-select" aria-labelledby="cuisines" name="cuisines">
         <option value="all" role="option" aria-setsize="4" aria-posinset="1">All Cuisines</option>
       </select>
+      <label id="sort" hidden>Choose your type of food</label>
+      <select id="sort-select" aria-labelledby="sort" name="sort">
+        <option value="Relevance" role="option" aria-setsize="4" aria-posinset="1">Relevant</option>
+      </select>
     </div>
   </header>
 
   <main id="maincontent">
-    <a href="#list-container" aria-label="Skip to the list of restaurant" role="link"></a>
+    <a id="skip" href="#list-container" aria-label="Skip to the list of restaurant" role="link"></a>
 
     <section id="map-container" aria-label="map" role="application">
       <aside id="map-loader">
-        <img src="assets/img/svg/map-loader.svg" height="100%" width="100%">
+        <img id="loader" src="assets/img/svg/map-loader.svg">
       </aside>
     </section>
 
