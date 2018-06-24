@@ -1,10 +1,13 @@
-const window = require('../node_modules/window-or-global/lib/index');
+const window = (typeof self === 'object' && self.self === self && self) ||
+  (typeof global === 'object' && global.global === global && global) ||
+  this;
+const idbKey = require('./js/indexedb');
 
-const version = new Date();
+const version = 3;
 const CURRENT_CACHES = {
   CACHE_STATIC: 'static-cache-' + version,
-  CACHE_MAP: 'map-api-1',
-  CACHE_FONT: 'google-fonts-1'
+  CACHE_MAP: 'map-api-2',
+  CACHE_FONT: 'google-fonts-3'
 }
 
 const URLS_TO_CACHE = [
@@ -28,22 +31,22 @@ const URLS_TO_CACHE = [
   'assets/css/index.css',
   'assets/css/restaurant_info.css',
   'js/main.js',
-  'js/restaurant_info.js',
+  'js/restaurant_info.js'
 ];
 
 self.addEventListener('install', event => {
   
-  console.log(`- Cache version : "${CACHE_STATIC}"`);
-  
+  console.log(`SW - Cache version : "${CURRENT_CACHES.CACHE_STATIC}"`);
+
   event.waitUntil(
     caches.open(CURRENT_CACHES.CACHE_STATIC)
       .then(cache => cache.addAll(URLS_TO_CACHE))
       .then(() => {
-        console.log('- All resources cached.');
+        console.log('SW - All resources cached.');
         self.skipWaiting();
-        console.log('- SW version skipped.');
+        console.log('SW - SW version skipped.');
       })
-      .catch(error => console.error('Open cache failed :', error))
+      .catch(error => console.error('SW - Open cache failed :', error))
   );
 
 });
@@ -53,91 +56,46 @@ self.addEventListener('activate', event => {
   const expectedCaches = Object.keys(CURRENT_CACHES).map(key => CURRENT_CACHES[key]);
 
   event.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.map(key => {
-        if (expectedCaches.indexOf(key) == -1) {
-          console.log('- Deleting', key);
-          return caches.delete(key)
-        }
-      })
-    )).then(() => console.log(`- "${CURRENT_CACHES.CACHE_STATIC}" now ready to handle fetches!`))
+    caches.keys()
+      .then(keys => Promise.all(keys.map(key => {
+          if (expectedCaches.indexOf(key) == -1) {
+            console.log('SW - Deleting', key);
+            return caches.delete(key)
+          }
+        })
+      ))
+      .then(() => console.log(`SW - "${CURRENT_CACHES.CACHE_STATIC}" now ready to handle fetches!`))
   );
 
 });
 
 self.addEventListener('fetch', event => {
-
   const url = new URL(event.request.url);
   const location = window.location;
 
   switch (url.hostname) {
-
     case 'maps.gstatic.com':
-      event.respondWith(
-        caches.open(CURRENT_CACHES.CACHE_MAP)
-          .then((cache) => cache.match(event.request)
-            .then((match) => match || fetch(url.href, {mode: 'no-cors'}))
-            .then((response) => {
-              cache.put(event.request, response.clone());
-              return response;
-            }, (error) => console.error(error)))
-      );
+      event.respondWith(getFromCacheOrFetch(CURRENT_CACHES.CACHE_MAP, event.request));
     break;
 
     case 'fonts.gstatic.com':
-      event.respondWith(
-        caches.open(CURRENT_CACHES.CACHE_FONT)
-          .then((cache) => cache.match(event.request)
-            .then((match) => match || fetch(url.href))
-            .then((response) => {
-              cache.put(event.request, response.clone());
-              return response;
-            }, (error) => console.error(error)))
-      );
+      event.respondWith(getFromCacheOrFetch(CURRENT_CACHES.CACHE_FONT, event.request));
     break;
 
     case location.hostname:
-      
-      if (url.pathname.startsWith('restaurant.html')) {
-
-        const newPath = url.href.replace(/[?&]id=\d/, '');
-
-        event.respondWith(
-          caches.open(CURRENT_CACHES.CACHE_STATIC)
-          .then((cache) => cache.match(newPath)
-            .then((match) => match || fetch(event.request))
-            .then((response) => {
-              cache.put(newPath, response.clone());
-              return response;
-            }, (error) => console.error(error)))
-        );
-
+      if (url.pathname.startsWith('/restaurant.html')) {
+        const newPath = url.href.replace(/[?&]id=\d{1,}/, '');
+        event.respondWith(getFromCacheOrFetch(CURRENT_CACHES.CACHE_STATIC, newPath));
       }
-      
+
       else if (url.pathname.endsWith('restaurants.json')) {
         event.respondWith(fetch(event.request));
       }
       
       else {
-        event.respondWith(
-          caches.open(CURRENT_CACHES.CACHE_STATIC)
-          .then((cache) => {
-              return cache.match(event.request)
-              .then((match) => match || fetch(event.request))
-              .then((response) => {
-                if (response.status === 200) {
-                    cache.put(event.request, response.clone());
-                    return response;
-                }
-                else if (url.pathname.indexOf('assets/img/') > -1) {
-                  cache.match(`${location.hostname}'/assets/img/svg/puff.svg`)
-                }
-                else {
-                  return response;
-                }
-              }, (error) => console.error('error :',error))
-          }, (error) => console.error('Error: ',error))
-        );
+        event.request.method !== 'POST'
+          ? event.respondWith(getFromCacheOrFetch(CURRENT_CACHES.CACHE_STATIC, event.request))
+          : event.respondWith(fetch(event.request));
       }
     break;
 
@@ -146,4 +104,45 @@ self.addEventListener('fetch', event => {
     break;
   }
   
+});
+
+function getFromCacheOrFetch(cache_id, request) {
+  return caches.open(cache_id)
+    .then((cache) => cache.match(request)
+      .then((match) => match || fetch(request))
+        .then((response) => {
+          cache.put(request, response.clone());
+          return response;
+        }, (error) => console.error('Error :', error))
+    , (error) => console.error('Error: ', error))
+}
+
+function postLocalReviews() {
+  const store = 'posts';
+  return idbKey.getAll(store).then(reviews => {
+    return Promise.all(reviews
+      .map(review => fetch('http://localhost:3000/reviews/', {
+        method: 'POST',
+        body: JSON.stringify(review),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(data => {
+          console.log(data);
+          if (data.command === "INSERT") {
+            return idbKey.delete(store, review.restaurant_id)
+          }
+        }))
+    )
+  }).catch((err) => console.error(err));
+}
+
+self.addEventListener('sync', function (event) {
+  if (event.tag == 'post-review') {
+    event.waitUntil(
+      postLocalReviews()
+        // .then(() => self.registration.showNotification("Markdowns synced to server"))
+        // .catch(() => self.registration.showNotification("Error syncing markdowns to server"))
+    );
+  }
 });

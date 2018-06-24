@@ -6,12 +6,28 @@ var map;
 
 const mapLoader = document.getElementById('map-loader');
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
+window.addEventListener('load', () => {
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
     const pathToServiceWorker = window.location.hostname === 'hallya.github.io' ? '/mws-restaurant-stage-1/sw.js' : '../sw.js'
-    navigator.serviceWorker.register(pathToServiceWorker).then(registration => console.log('registration to serviceWorker complete with scope :', registration.scope));
-  });
-}
+    navigator.serviceWorker.register(pathToServiceWorker)
+      .then(registration => {
+        console.log('registration to serviceWorker complete with scope :', registration.scope);
+        Notification.requestPermission().then(function (result) {
+          if (result === 'denied') {
+            console.log('Permission wasn\'t granted. Allow a retry.');
+            return;
+          }
+          if (result === 'default') {
+            console.log('The permission request was dismissed.');
+            return;
+          }
+          if (result === 'granted') { 
+            console.log('Notification allowed')
+          }
+        });
+      });
+  }
+});
 /**
  * Initialize Google map, called from HTML.
  */
@@ -24,7 +40,10 @@ window.initMap = () => {
       mapPlaceHolder.id = "map";
       self.map = new google.maps.Map(mapPlaceHolder, {
         zoom: 16,
-        center: restaurant.latlng,
+        center: {
+          lat: restaurant.lat,
+          lng: restaurant.lng
+        },
         streetViewControl: false,
         mapTypeId: 'roadmap',
         mapTypeControl: false,
@@ -263,7 +282,6 @@ const showForm = () => {
   const commentsInput = document.createElement('textarea');
   const labelSubmitButton = document.createElement('label');
   const submitButton = document.createElement('input');
-  const submitImage = document.createElement('img');
 
   commentsInput.id = 'form-comment';
   commentsInput.name = 'comments';
@@ -299,7 +317,7 @@ const showForm = () => {
 
   form.addEventListener('submit', DBHelper.postReview);
 
-  document.getElementById('title-container').style.height = '300px';
+  document.getElementById('title-container').classList.toggle('form-open');
   document.getElementById('title-container').appendChild(form);
   form.classList.toggle('form-toggled');
   setTimeout(() => {
@@ -311,11 +329,11 @@ const showForm = () => {
 
 const hideForm = () => {
   document.querySelector('#title-container form').classList.toggle('form-toggled');
+  document.getElementById('title-container').classList.toggle('form-open');
   setTimeout(() => {
     document.querySelector('#title-container form').remove();
   }, 300)
   document.querySelectorAll('#title-container button span').forEach(span => span.classList.toggle('toggled'))
-  document.getElementById('title-container').style.height = '50px';
   document.querySelector('#title-container button').removeEventListener('click', hideForm);
   document.querySelector('#title-container button').addEventListener('click', showForm);
 }
@@ -332,7 +350,8 @@ const createReviewHTML = (review) => {
 
   const date = document.createElement('p');
   date.className = 'dateReview';
-  date.innerHTML = review.date;
+  const convertDate = new Date(review.updatedAt);
+  date.innerHTML = convertDate.toDateString();
   date.setAttribute('aria-label', `${review.date},`);
   li.appendChild(date);
 
@@ -372,6 +391,7 @@ const fillBreadcrumb = (restaurant = self.restaurant) => {
   li.className = 'fontawesome-arrow-right';
   li.setAttribute('aria-current', 'page');
   breadcrumb.appendChild(li);
+  Launch.fixedOnViewport(document.querySelector('nav'), document.querySelector('#breadcrumb'));
 };
 
 /**

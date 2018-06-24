@@ -38,7 +38,7 @@
   <link rel="stylesheet" href="assets/css/index.css" charset="utf-8" type="text/css">
   <link rel="image" href="assets/img/svg/map-loader.svg">
   <link rel="image" href="assets/img/svg/puff.svg">
-  <link rel="image" href="/assets/img/svg/marker.svg">
+  <link rel="image" href="assets/img/svg/marker.svg">
   <link rel="manifest" href="manifest.webmanifest">
   <style>
    
@@ -50,12 +50,12 @@
   <header>
     <nav>
       <h1>
-        <a href="index.html">Restaurant Reviews</a>
+        <a href="#">Restaurant Reviews</a>
       </h1>
-      <button id="menuFilter" class="iconicfill-equalizer" role="button" aria-labelledby="filtersSettings"></button>
+        <button id="menuFilter" class="iconicfill-equalizer" role="button" aria-labelledby="filtersSettings"></button>
       <label id="filtersSettings" hidden>Filter settings</label>
     </nav>
-    <div class="filter-options" role="menu" aria-hidden="true">
+    <aside class="filter-options" role="menu" aria-hidden="true">
       <h3 id="filters" aria-label="filter results"></h3>
       <label id="location" hidden>Choose your location</label>
       <select id="neighborhoods-select" aria-labelledby="location" name="neighborhoods">
@@ -69,7 +69,7 @@
       <select id="sort-select" aria-labelledby="sort" name="sort">
         <option value="Relevance" role="option" aria-setsize="4" aria-posinset="1">Relevant</option>
       </select>
-    </div>
+    </aside>
   </header>
 
   <main id="maincontent">

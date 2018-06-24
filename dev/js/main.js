@@ -11,69 +11,58 @@ let cuisine;
 let neighborhood;
 let sort;
 
-const mainContent = document.querySelector('main'),
-  footer = document.querySelector('footer'),
+const 
   filterOptions = document.querySelector('.filter-options'),
-  filterResultHeading = document.querySelector('.filter-options h3'),
-  filterButton = document.querySelector('#menuFilter'),
+  filterButton = document.getElementById('menuFilter'),
   listOfRestaurants = document.querySelector('#restaurants-list'),
-  // sectionRestaurantsList = document.querySelector('#list-container'),
-  sectionMap = document.getElementById('#map-container'),
   neighborhoodsSelect = document.querySelector('#neighborhoods-select'),
   cuisinesSelect = document.querySelector('#cuisines-select'),
   sortSelect = document.querySelector('#sort-select'),
-  mapDiv = document.querySelector('#map'),
   loader = document.querySelector('#map-loader');
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', () => {
+
   updateRestaurants()
     .then(addSortOptions)
-    .then(fetchCuisines)
-    .then(fetchNeighborhoods)
+    .then(addCuisinesOptions)
+    .then(addNeighborhoodsOptions)
     .catch(error => console.error(error));
-  // fetchCuisines();
-  // fetchNeighborhoods();
 });
 
 
-filterButton.addEventListener('click', toggleMenu);
 /**
  * Open or close the options/filter menu.
  */
-function toggleMenu() {
-  filterOptions.classList.toggle('optionsOpen');
-  mainContent.classList.toggle('moveDown');
-  footer.classList.toggle('moveDown');
-  filterButton.classList.toggle('pressed');
-  filterOptions.setAttribute('aria-hidden', 'false');
-  filterButton.blur();
-  filterResultHeading.setAttribute('tabindex', '-1');
-  filterResultHeading.focus();
-}
+
 
 /**
  * Register to service worker if the browser is compatible.
  */
 window.addEventListener('load', () => {
+  
   if ('serviceWorker' in navigator) {
     const pathToServiceWorker = window.location.hostname === 'hallya.github.io' ? '/mws-restaurant-stage-1/sw.js' : '../sw.js'
-    navigator.serviceWorker.register(pathToServiceWorker).then(registration => console.log('registration to serviceWorker complete with scope :', registration.scope));
+    navigator.serviceWorker.register(pathToServiceWorker)
+      .then(registration => console.log('registration to serviceWorker complete with scope :', registration.scope));
   }
-  if (!window.navigator.standalone && (window.navigator.userAgent.indexOf('Android') === -1 && window.navigator.userAgent.indexOf('Linux') === -1)) {
-    addBannerToHomeScreen();
+
+  if (!window.navigator.standalone
+    && window.navigator.userAgent.indexOf('Android') === -1
+    && window.navigator.userAgent.indexOf('Linux') === -1
+    && window.innerWidth < 550) {
+      addBannerToHomeScreen();
   }
-  // if (window.navigator.userAgent.indexOf('Android') > -1 || window.navigator.userAgent.indexOf('iPhone') > -1) {
-  //   launch.lazyMap()
-  // }
+
   cuisinesSelect.addEventListener('change', updateRestaurants);
   neighborhoodsSelect.addEventListener('change', updateRestaurants);
   sortSelect.addEventListener('change', updateRestaurants);
-  
-});
 
+});
+    
+filterButton.addEventListener('click', launch.toggleMenu);
 
 /**
  * If select/filter menu is open, press enter will make the restaurants list focus.
@@ -84,21 +73,20 @@ document.onkeypress = function (e) {
     listOfRestaurants.setAttribute('tabindex', '-1');
     listOfRestaurants.focus();
     document.getElementById('skip').click();
-    // window.scrollTo(0, sectionMap.clientHeight*2);
   }
 };
 /**
  * Fetch all neighborhoods and set their HTML.
  */
-const fetchNeighborhoods = (restaurants = self.restaurants) => {
-  self.neighborhoods = DBHelper.fetchNeighborhoods(restaurants);
+const addNeighborhoodsOptions = (restaurants = self.restaurants) => {
+  self.neighborhoods = DBHelper.addNeighborhoodsOptions(restaurants);
   fillNeighborhoodsHTML();
 };
 /**
  * Fetch all cuisines and set their HTML.
  */
-const fetchCuisines = (restaurants = self.restaurants) => {
-  self.cuisines = DBHelper.fetchCuisines(restaurants);
+const addCuisinesOptions = (restaurants = self.restaurants) => {
+  self.cuisines = DBHelper.addCuisinesOptions(restaurants);
   fillCuisinesHTML();
 };
 
@@ -137,14 +125,17 @@ const fillCuisinesHTML = (cuisines = self.cuisines) => {
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
+  
   const mapPlaceHolder = document.createElement('div');
   mapPlaceHolder.setAttribute('tabindex', '-1');
   mapPlaceHolder.setAttribute('aria-hidden', 'true');
   mapPlaceHolder.id = "map";
-  let loc = {
+
+  const loc = {
     lat: 40.722216,
     lng: -73.987501
   };
+
   self.map = new google.maps.Map(mapPlaceHolder, {
     center: loc,
     zoom: 12,
@@ -152,7 +143,9 @@ window.initMap = () => {
     mapTypeId: 'roadmap',
     mapTypeControl: false,
   });
+
   document.getElementById('map-container').appendChild(mapPlaceHolder);
+  
   self.map.addListener('tilesloaded', function () {
     loader.remove();
     addMarkersToMap();
@@ -304,55 +297,49 @@ const createRestaurantHTML = (restaurant) => {
   const note = document.createElement('p');
 
   sourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-large_x1.webp 1x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-large_x2.webp 2x`;
-  // sourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-lazy.webp`;
   sourceWebp.srcset = 'assets/img/svg/puff.svg';
   sourceWebp.media = '(min-width: 1000px)';
   sourceWebp.className = 'lazy';
   sourceWebp.type = 'image/webp';
   source.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-large_x2.jpg 2x`;
-  // source.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
   source.srcset = 'assets/img/svg/puff.svg';
   source.media = '(min-width: 1000px)';
   source.className = 'lazy';
   source.type = 'image/jpeg';
   
   secondSourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-medium_x1.webp 1x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-medium_x2.webp 2x`;
-  // secondSourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-lazy.webp`;
   secondSourceWebp.srcset = 'assets/img/svg/puff.svg';
   secondSourceWebp.media = '(min-width: 420px)';
   secondSourceWebp.className = 'lazy';
   secondSourceWebp.type = 'image/webp';
   secondSource.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-medium_x2.jpg 2x`;
-  // secondSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
   secondSource.srcset = 'assets/img/svg/puff.svg';
   secondSource.media = '(min-width: 420px)';
   secondSource.className = 'lazy';
   secondSource.type = 'image/jpeg';
   
   thSourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-small_x2.webp 2x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-small_x1.webp 1x`;
-  // thSourceWebp.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-lazy.webp`;
   thSourceWebp.srcset = 'assets/img/svg/puff.svg';
   thSourceWebp.media = '(min-width: 320px)';
   thSourceWebp.className = 'lazy';
   thSourceWebp.type = 'image/webp';
   thSource.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-small_x2.jpg 2x, ${DBHelper.imageUrlForRestaurant(restaurant)}-small_x1.jpg 1x`;
-  // thSource.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
   thSource.srcset = 'assets/img/svg/puff.svg';
   thSource.media = '(min-width: 320px)';
   thSource.className = 'lazy';
   thSource.type = 'image/jpeg';
   
   image.dataset.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-small_x1.jpg`;
-  // image.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-lazy.jpg`;
   image.src = 'assets/img/svg/puff.svg';
   image.className = 'restaurant-img lazy';
   image.setAttribute('sizes', '(max-width: 1100px) 85vw, (min-width: 1101px) 990px');
   image.alt = `${restaurant.name}'s restaurant`;
   image.type = 'image/jpeg';
   
-  note.innerHTML = `${launch.getAverageNote(restaurant.reviews)}/5`;
+  note.innerHTML = `${restaurant.average_rating}/5`;
 
   containerNote.append(note);
+  containerNote.id = 'container-note';
 
   picture.append(sourceWebp);
   picture.append(source);
@@ -361,7 +348,17 @@ const createRestaurantHTML = (restaurant) => {
   picture.append(thSourceWebp);
   picture.append(thSource);
   picture.append(image);
+
+  const more = document.createElement('a');
+  more.innerHTML = '';
+  more.className = 'fontawesome-arrow-right';
+  more.dataset.url = DBHelper.urlForRestaurant(restaurant);
+  more.addEventListener('click', launch.goToRestaurantPage)
+  more.setAttribute('aria-label', `View details of ${restaurant.name}`);
+  more.setAttribute('rel', 'noopener');
+
   figure.append(picture);
+  figcaption.append(more);
   figure.append(figcaption);
   
   li.append(containerNote);
@@ -378,13 +375,6 @@ const createRestaurantHTML = (restaurant) => {
   const address = document.createElement('p');
   address.innerHTML = restaurant.address;
   li.append(address);
-
-  const more = document.createElement('a');
-  more.innerHTML = 'View Details';
-  more.href = DBHelper.urlForRestaurant(restaurant);
-  more.setAttribute('aria-label', `View details of ${restaurant.name}`);
-  more.setAttribute('rel', 'noopener');
-  li.append(more);
 
   li.setAttribute('role', 'listitem');
   li.setAttribute('aria-setsize', '10');

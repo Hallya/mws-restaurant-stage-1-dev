@@ -24,8 +24,10 @@ $screen-m-min: 550px;
 $screen-l-min: 1000px;
 $screen-xl-min: 2000px;
 $first-color: #ca0000;
-$second-color: #f58400;
+$second-color: black;
+$box-shadow: 0 0 30px -10px black;
 $background-primary-color: #fff;
+$breadcrumb: #444444;
 $background-secondary-color: #252831;
 @mixin m {
   @media screen and (min-width: #{$screen-m-min}) {
@@ -48,14 +50,14 @@ $background-secondary-color: #252831;
 [class*="fontawesome-"]:before {
   content: '\f061';
   font-family: 'breadcrumb', sans-serif;
-  color: $background-primary-color;
+  color: $breadcrumb;
 }
 
 body,
 td,
 th,
 p {
-  color: $background-secondary-color;
+  color: $second-color;
   line-height: 1.5;
 }
 
@@ -84,10 +86,13 @@ p {
   text-align: right;
   padding-right: 5%;
   font-family: 'Montserrat', sans-serif;
+  @include l {
+    padding-right: 0;
+  }
 }
 
 a {
-  color: orange;
+  color: $first-color;
   text-decoration: none;
 }
 
@@ -140,22 +145,19 @@ img {
 }
 
 header {
-  height: 7em;
-  @include xl {
-    height: 8em;
-  }
-  #breadcrumb {
+  ul {
     list-style: none;
-    background-color: $background-secondary-color;
-    height: 30%;
-    width: 100%;
-    padding-left: 1%;
+    box-shadow: 0 0 0px 0px white;
+    margin: 0 0 0 10px;
+    padding: 1%;
+    transition: 0.2s;
+
     @include xl {
       font-size: 1.3em;
     }
     li {
       display: inline;
-      color: $background-primary-color;
+      color: $breadcrumb;
       font-size: 1em;
       font-family: 'Montserrat', sans-serif;
       padding-right: 5px;
@@ -164,7 +166,7 @@ header {
       }
       /* Add a color to all links the list */
       a {
-        color: #f58301;
+        color: $first-color;
         text-decoration: none;
         /* Add a color on mouse-over */
         a:hover {
@@ -174,6 +176,23 @@ header {
       }
       /* Add a slash symbol (/) before/behind each list item */
     }
+  }
+  .fixed {
+    box-shadow: 0 0 0px 0px white;
+    background: white;
+    position: fixed;
+    z-index: 5;
+    top: 0;
+    left: 0;
+    right: 0;
+    transition: box-shadow 0.4s;
+  }
+  .exclude {
+    opacity: 0;
+  }
+  .shadow {
+    opacity: 1;
+    box-shadow: 0 0 30px 20px white;
   }
 }
 
@@ -213,8 +232,6 @@ main {
 
 nav {
   width: 100%;
-  height: 100%;
-  background-color: $background-secondary-color;
   text-align: center;
   display: flex;
   justify-content: space-between;
@@ -228,7 +245,7 @@ nav {
     margin-left: 5%;
     text-align: left;
     a {
-      color: $background-primary-color;
+      color: $second-color;
       font-size: 1em;
       letter-spacing: 5px;
       text-transform: uppercase;
@@ -251,10 +268,10 @@ nav {
   width: 100%;
   height: 200px;
   transition: 0.2s;
-  box-shadow: 0 0 80px -25px black;
+  box-shadow: $box-shadow;
   background-color: $background-secondary-color;
   @include m {
-    height: 320px;
+    height: 120px;
     width: 550px;
     margin: 2% auto;
     border-radius: 25px;
@@ -304,18 +321,12 @@ nav {
 .inside {
   header {
     width: 100%;
-    background-color: $background-secondary-color;
-    @include l {
-      height: 8em;
-    }
-    @include xl {
-      height: 13em;
-    }
+    background-color: $background-primary-color;
   }
   nav {
-    height: 65%;
-    background-color: $background-secondary-color;
     h1 {
+      margin: 10px 0 0 10px;
+      color: $second-color;
       @include l {
         font-size: 1.9em;
       }
@@ -323,7 +334,7 @@ nav {
   }
   ul {
     margin: 0;
-    padding: 0;
+    padding: 2%;
   }
   #restaurant-container {
     @include l {
@@ -342,7 +353,7 @@ nav {
     h1,
     h2 {
       padding: 2%;
-      color: $first-color;
+      color: $background-primary-color;
       width: 90%;
       margin: 0 auto;
       text-align: left;
@@ -359,13 +370,15 @@ nav {
       }
     }
     #restaurant-name {
-      color: #f58400;
+      color: $first-color;
       width: 96%;
-      background: $background-secondary-color;
+      background: $background-primary-color;
       font-size: 20pt;
       font-weight: 200;
       letter-spacing: 0;
-      margin: 0 auto;
+      margin: 10px auto;
+      box-shadow: $box-shadow;
+      border-radius: 25px;
       text-transform: uppercase;
       line-height: 1.1;
       @include m {
@@ -384,6 +397,11 @@ nav {
     img,
     source {
       width: 100%;
+      @include m {
+        border-top-left-radius: 25px;
+        border-top-right-radius: 25px;
+        box-shadow: $box-shadow;
+      }
       @include l {
         margin: 0 auto;
       }
@@ -400,8 +418,9 @@ nav {
       border-top: 5px solid;
     }
     #restaurant-cuisine {
-      background-color: $background-secondary-color;
-      color: $background-primary-color;
+      background-color: $background-primary-color;
+      color: $first-color;
+      box-shadow: $box-shadow;
       font-size: 12pt;
       font-weight: 300;
       letter-spacing: 10px;
@@ -428,8 +447,14 @@ nav {
       }
     }
     #restaurant-address {
-      font-size: 0.8em;
-      margin: 5% 0;
+      font-size: 1em;
+      border-radius: 25px;
+      color: $second-color;
+      margin: 0;
+      @include m {
+        font-size: 1.2em;
+        box-shadow: none;
+      }
       @include l {
         font-size: 1.5em;
       }
@@ -440,14 +465,20 @@ nav {
     }
     #restaurant-hours {
       margin: 5% 2%;
-      padding: 4%;
+      padding: 2%;
       font: 0.8em 'Montserrat', sans-serif;
-      box-shadow: 0 0 30px -10px black;
+      box-shadow: $box-shadow;
       width: 95%;
       border-radius: 25px;
       position: relative;
       background-color: white;
       z-index: 2;
+      @include m {
+        width: auto;
+      }
+      @include l {
+        width: 40%;
+      }
       @include xl {
         font-size: 1.1em;
       }
@@ -485,9 +516,12 @@ nav {
       justify-content: left;
       flex-flow: wrap column;
       width: 86%;
-      padding: 4%;
-      transition: 0.3s;
+      padding: 2%;
+      transition: 0.1s;
 
+      @include m {
+
+      }
       ::placeholder {
         color: rgba(168, 106, 106, 0.849);
       }
@@ -532,7 +566,7 @@ nav {
       input[type='text']:valid,
       textarea:valid {
         border: 1px solid rgb(223, 253, 225);
-        box-shadow: 0 0 0px 1000px rgb(223, 253, 225) inset;
+        background-color:rgb(223, 253, 225);
       }
       input[type='text']:valid[true] ~ input[type='submit'] {
         color: green;
@@ -540,7 +574,7 @@ nav {
       input:invalid,
       textarea:invalid {
         border: 1px solid rgba(255, 85, 85, 0.425);
-        box-shadow: 0 0 0px 1000px rgba(255, 85, 85, 0.425) inset;
+        background-color: rgba(255, 85, 85, 0.425);
       }
       fieldset {
         border: none;
@@ -591,7 +625,7 @@ nav {
         margin: 20px auto;
       }
     }
-    #title-container {
+    div {
       width: 90%;
       height: 50px;
       margin: 20px auto;
@@ -599,9 +633,8 @@ nav {
       display: flex;
       justify-content: center;
       flex-flow: wrap row;
-      box-shadow: 0 0 30px -10px black;
+      box-shadow: $box-shadow;
       transition: 0.1s ease-in-out;
-
       h3 {
         color: $first-color;
         font-size: 2em;
@@ -618,27 +651,41 @@ nav {
       }
       button {
         width: 20%;
-        height: 50px;
         padding: 0;
         margin: 0;
         text-align: center;
         position: relative;
+        border: none;
+        background-color: transparent;
         
         span {
           color: #f06969;
           font-size: 3em;
           width: 100%;
-          height: 100%;
           opacity: 1;
           position: absolute;
           top: 0;
           left: 0;
           transition: 0.1s;
         }
+        p {
+          text-align: center;
+          margin: 0;
+          padding: 0;
+        }
         .toggled {
           opacity: 0;
         }
       }
+    }
+    .form-open {
+      height: 300px;
+      @include m {
+        height: 320px;
+      } 
+      @include l {
+        height: 350px;
+      } 
     }
     #reviews-list {
       margin: 0;
@@ -656,7 +703,7 @@ nav {
         list-style-type: none;
         margin: 2%;
         padding: 4%;
-        box-shadow: 0 0 30px -10px black;
+        box-shadow: $box-shadow;
         border-radius: 25px;
         position: relative;
         @include xl {
@@ -665,6 +712,7 @@ nav {
         }
         p {
           margin: 0 0 10px;
+          color: $second-color;
           text-align: justify;
         }
         .dateReview {
@@ -693,10 +741,17 @@ nav {
     #star5 {
       color: #b10000;
     }
+    p {
+      text-align: center;
+      font-family: 'Montserrat', sans-serif;
+      padding: 0;
+      margin:0 0 20px 0;
+
+    }
   }
   #footer {
-    background-color: $background-secondary-color;
-    color: #dbdbdb;
+    background-color: $background-primary-color;
+    color: $second-color;
     padding: 1%;
     font-size: 0.8em;
     letter-spacing: 1px;

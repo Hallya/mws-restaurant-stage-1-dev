@@ -16,16 +16,25 @@
   font-family: 'menusetting';
   src: url('fonts/iconicfill.woff2') format('woff2'),
 }
-
-$screen-s-min: 320px;
+@font-face {
+  font-family: "breadcrumb";
+  src: url('fonts/fontawesome.woff2');
+}
+$screen-s-min: 330px;
 $screen-m-min: 550px;
 $screen-l-min: 1000px;
 $screen-xl-min: 2000px;
 $first-color: #ca0000;
-$second-color: #f58400;
+$second-color: black;
+$box-shadow: 0 0 30px -10px black;
 $background-primary-color: #fff;
 $background-secondary-color: #252831;
 
+@mixin s {
+  @media screen and (max-width: #{$screen-s-min}){
+    @content;
+  }
+}
 @mixin m {
   @media screen and (min-width: #{$screen-m-min}){
     @content;
@@ -65,7 +74,10 @@ $background-secondary-color: #252831;
   content: '\2193';
   font-family: 'menusetting', sans-serif;
 }
-
+[class*="fontawesome-"]:before {
+  content: '\f061';
+  font-family: 'breadcrumb', sans-serif;
+}
 
 
 body, td, th, p {
@@ -80,14 +92,10 @@ body {
   width: 100%;
   max-width: 100%;
 
-  @include m{
-    position: relative;
-    z-index: -1;
-  }
-
   main {
+    transition: 0.5s;
+
     @include m {
-      will-change: transform;
       transform: translateY(0em);
     }
   }
@@ -100,9 +108,10 @@ body {
 }
 .moveDown {
   @include m {
-    transform: translateY(7.5em);
+    transform: translateY(1.5em);
   }
 }
+
 
 .wrapper {
   position: relative;
@@ -118,8 +127,17 @@ main ul, li {
 figure, figcaption {
   margin: 0;
   padding: 0;
+  position: relative;
 }
-
+figure {
+  box-shadow: 0 0 30px -10px black;
+  border-radius: 25px;
+}
+figcaption {
+  @include s {
+    height: 48px;
+  }
+}
 p {
   text-align: right;
   padding-right: 5%;
@@ -179,11 +197,26 @@ img {
 }
 
 header {
-  height: 7em;
+  box-shadow: $box-shadow;
+}
+.fixed {
+  box-shadow: 0 0 0px 0px white;
+  background: white;
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+  transition: 0.2s;
+}
 
-  @include xl {
-    height: 8em;
-  }
+.exclude {
+  opacity: 0;
+}
+
+.shadow {
+  opacity: 1;
+  box-shadow: 0 0 30px 20px white;
 }
 
 main {
@@ -206,6 +239,7 @@ main {
     display: none;
     transition: 0.2s;
     will-change: transform;
+    
     @include mobile {
       
       display: flex;
@@ -280,8 +314,7 @@ main {
 
 nav {
   width: 100%;
-  height: 100%;
-  background-color: $background-secondary-color;
+  background-color: $background-primary-color;
   text-align: center;
   display: flex;
   justify-content: space-between;
@@ -289,7 +322,7 @@ nav {
 
   @include m {
     position: relative;
-    z-index: 1;
+    z-index: 2;
   }
   
   h1 {
@@ -298,7 +331,7 @@ nav {
     text-align: left;
     
     a {
-      color:  $background-primary-color;
+      color:  $second-color;
       font-size: 1em;
       letter-spacing: 5px;
       text-transform: uppercase;
@@ -318,10 +351,10 @@ nav {
     min-width: 48px;
     min-height: 48px;
     margin-right: 0%;
-    color: $background-primary-color;
+    color: $second-color;
     font-size: 2.5em;
-    background-color: $background-secondary-color;
-    border: 2px solid $background-secondary-color;
+    background-color: $background-primary-color;
+    border: 2px solid $background-primary-color;
     
     @include l {
       margin-right: 5%;
@@ -343,29 +376,31 @@ nav {
 /* ====================== Restaurant Filtering ====================== */
 
 .filter-options {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-flow: wrap row;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  width: 75vw;
-  overflow: hidden;
-  border-bottom: 3px solid #ff0404;
-  border-bottom-left-radius: 25px;
-  border-bottom-right-radius: 25px;
-  background: linear-gradient(to bottom, #a50000 10%, $first-color 100%);
-  transition: 0.3s ease-in-out;
-  will-change: transform;
-  transform: translate3d(-1em, -22em, 0);
-  visibility: hidden;
-  opacity: 0;
+      position: absolute;
+      box-shadow: $box-shadow;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      right: 20vw;
+      padding: 10px;
+      display: flex;
+      flex-flow: wrap row;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      overflow: hidden;
+      border-bottom: 3px solid #ff0404;
+      border-bottom-left-radius: 25px;
+      border-bottom-right-radius: 25px;
+      background: $background-primary-color;
+      transition: 0.3s ease-in-out;
+      will-change: transform;
+      transform: translateY(-14em);
+      opacity: 1;
   @include m {
-    transform: translateY(-7.5em);
-    height: 4em;
-    width: 100vw;
-    z-index: 0;
+    transform: translateY(-8em);
+    z-index: 1;
+    right: 0;
   }
   h3 {
     color: #6d0090;
@@ -383,8 +418,8 @@ nav {
   
   select {
     background-color: transparent;
-    border: 1px solid #ffd3d3;
-    color: white;
+    border: 1px solid #e6e6e6;
+    color: $second-color;
     font-size: 1.3em;
     height: 35px;
     letter-spacing: 0;
@@ -394,11 +429,11 @@ nav {
 }
 
 .optionsOpen {
-  transform: translate3d(-1em, -7em, 0);
+  transform: translateY(0em);
   visibility: visible;
   opacity: 1;
   @include m {
-    transform: translateY(0em);
+    transform: translateY(4em);
   }
 }
 
@@ -482,13 +517,10 @@ nav {
     margin: 1%;
   }
   li {
-    box-shadow: 0px 0px 80px -15px #000000d1;
-    border-radius: 25px;
     font-family: Arial, sans-serif;
     position: relative;
-    min-height: 380px;
     padding: 0;
-    width: 92%;
+    width: 95%;
     margin: 5% auto;
     text-align: center;
     
@@ -505,14 +537,17 @@ nav {
       width: 95%;
       height: 3em;
       margin: 0 auto;
-      border-bottom: 1px dotted;
-      text-shadow: 1px 1px 1px #c56300;
       font-family: 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
       font-size: 14pt;
       font-weight: 200;
       letter-spacing: 2px;
       line-height: 3em;
       text-transform: uppercase;
+      
+      @include s {
+        line-height: 48px;
+        font-size: 11pt;
+      }
     }
     
     .restaurant-img {
@@ -525,7 +560,7 @@ nav {
       border-top-right-radius: 25px;
       border-top-left-radius: 25px;
     }
-    aside {
+    #container-note {
       position: absolute;
       top: 0;
       right: 0;
@@ -533,14 +568,14 @@ nav {
       text-align: center;
       margin: 3% 3% 0 0;
       background-color: #ffffff;
-      box-shadow: 0px 1px 29px -4px black;
+      box-shadow: $box-shadow;
       border-radius: 50px;
       height: 3em;
       width: 3em;
       line-height: 3em;
 
       p {
-        color: #00d2b5;
+        color: $first-color;
         font-family: 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
         margin: 0;
         line-height: 2.8em;
@@ -554,17 +589,29 @@ nav {
     
     a {
       background-color: $first-color;
-      border-radius: 25px;
-      box-shadow: 0px 6px 2px -3px #8a8a8a;
       color:  $background-primary-color;
-      display: inline-block;
-      font-size: 10pt;
-      margin: 4% 0;
-      width: 10em;
-      line-height: 48px;
-      text-align: center;
-      text-decoration: none;
-      text-transform: uppercase;
+      position: absolute;
+      font-size: 1.5em;
+      line-height: 2.5em;
+      margin: 0;
+      padding: 0;
+      top: 0;
+      right: 0;
+      width: 0;
+      // left: 85%;
+      transition: 0.2s;
+      transform: translateZ(0);
+      bottom: 0;
+      will-change: width;
+      border-bottom-right-radius: 25px;
+      
+      @include s {
+        line-height: 48px;
+      }
+    }
+    .move-left {
+      width: 100%;
+      border-bottom-left-radius: 25px;
     }
   }
 }

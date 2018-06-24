@@ -26,7 +26,8 @@ gulp.task('default', ['styles', 'copy-html', 'scripts', 'copy-manifest'],() => {
 
   connect.server({
     root: 'dist',
-    livereload: true
+    livereload: true,
+    port: 7070
   })
 });
 
@@ -37,7 +38,8 @@ gulp.task('build', ['styles', 'copy-html', 'scripts-dist', 'copy-manifest'], () 
   gulp.watch('dev/manifest.json', ['copy-manifest']);
   connect.server({
     root: 'dist',
-    livereload: true
+    livereload: true,
+    port: 7070
   })
 });
 
