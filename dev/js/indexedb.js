@@ -6,7 +6,7 @@ const openDatabase = () => {
       case 0:
         upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
       case 1:
-        upgradeDb.createObjectStore('reviews', { keyPath: 'id' });
+        upgradeDb.createObjectStore('reviews', { keyPath: 'id', autoIncrement:true});
       case 1:
         upgradeDb.createObjectStore('posts', {keyPath: 'restaurant_id'});
     }
@@ -49,6 +49,15 @@ const idbKey = {
         .transaction(store, 'readwrite')
         .objectStore(store)
         .delete(id);
+    }).catch(error => console.error(error));
+  },
+  addReview(store, review) {
+    return openDatabase().then(db => {
+      if (!db) return;
+      return db
+        .transaction(store, 'readwrite')
+        .objectStore(store)
+        .add(review);
     }).catch(error => console.error(error));
   },
   getRestaurantReviews(store, key) {

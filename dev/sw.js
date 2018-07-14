@@ -2,11 +2,12 @@ const window = (typeof self === 'object' && self.self === self && self) ||
   (typeof global === 'object' && global.global === global && global) ||
   this;
 const idbKey = require('./js/indexedb');
+const DBHelper = require('./js/dbhelper');
 
-const version = 3;
+const version = 6;
 const CURRENT_CACHES = {
   CACHE_STATIC: 'static-cache-' + version,
-  CACHE_MAP: 'map-api-2',
+  CACHE_MAP: 'map-api-' + version,
   CACHE_FONT: 'google-fonts-3'
 }
 
@@ -117,32 +118,45 @@ function getFromCacheOrFetch(cache_id, request) {
     , (error) => console.error('Error: ', error))
 }
 
-function postLocalReviews() {
+async function postLocalReviews() {
   const store = 'posts';
-  return idbKey.getAll(store).then(reviews => {
-    return Promise.all(reviews
-      .map(review => fetch('http://localhost:3000/reviews/', {
-        method: 'POST',
-        body: JSON.stringify(review),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(data => {
-          console.log(data);
-          if (data.command === "INSERT") {
-            return idbKey.delete(store, review.restaurant_id)
+  const reviews = await idbKey.getAll(store).catch(err => console.error(err));
+  
+  const promises = await Promise.all(reviews
+    .map(review => {
+      return DBHelper.DATABASE_URL.POST.newReview(review)
+        .then(response => {
+          console.log('Response after post request', response,'\nStatus :',response.status)
+          if (response.status === 201) {
+            self.registration.showNotification("Review synchronised to server")
+              .then(() => idbKey.delete(store, review.restaurant_id))
           }
-        }))
-    )
-  }).catch((err) => console.error(err));
+
+          return response;
+        })
+        .catch(error => {
+          self.registration.showNotification("Your review will be posted later");
+          self.registration.showNotification("You can quit this app if needed");
+          console.error('Review not posted',error);
+        })
+    }))
+}
+
+const fetchLastReviews = async () => {
+  const response = await DBHelper.DATABASE_URL.GET.allReviews();
+  const reviews = await response.json(),
+    store = 'reviews';
+  reviews.forEach(review => idbKey.set(store, review))
 }
 
 self.addEventListener('sync', function (event) {
-  if (event.tag == 'post-review') {
-    event.waitUntil(
-      postLocalReviews()
-        // .then(() => self.registration.showNotification("Markdowns synced to server"))
-        // .catch(() => self.registration.showNotification("Error syncing markdowns to server"))
-    );
+  if (event.tag === 'post-review') {
+    event.waitUntil(postLocalReviews());
+  }
+  if (event.lastChance) {
+    console.log('Last time trying to sync')
+  }
+  if (event.tag === 'fetch-new-reviews') {
+    event.waitUntil(fetchLastReviews())
   }
 });

@@ -61,7 +61,8 @@ gulp.task('scripts-dist', (done) => {
     .pipe(browserify())
     .pipe(uglify())
     .pipe(gulp.dest('dist/js'));
-    gulp.src('dev/sw.js')
+  gulp.src('dev/sw.js')
+    .pipe(browserify())
     .pipe(uglify())
     .pipe(gulp.dest('dist'));
   connect.reload();

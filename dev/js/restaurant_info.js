@@ -11,20 +11,8 @@ window.addEventListener('load', () => {
     const pathToServiceWorker = window.location.hostname === 'hallya.github.io' ? '/mws-restaurant-stage-1/sw.js' : '../sw.js'
     navigator.serviceWorker.register(pathToServiceWorker)
       .then(registration => {
-        console.log('registration to serviceWorker complete with scope :', registration.scope);
-        Notification.requestPermission().then(function (result) {
-          if (result === 'denied') {
-            console.log('Permission wasn\'t granted. Allow a retry.');
-            return;
-          }
-          if (result === 'default') {
-            console.log('The permission request was dismissed.');
-            return;
-          }
-          if (result === 'granted') { 
-            console.log('Notification allowed')
-          }
-        });
+        registration.sync.register('post-review');
+        registration.sync.register('fetch-new-reviews');
       });
   }
 });
@@ -41,12 +29,11 @@ window.initMap = () => {
       self.map = new google.maps.Map(mapPlaceHolder, {
         zoom: 16,
         center: {
-          lat: restaurant.lat,
-          lng: restaurant.lng
+          lat: restaurant.lat || restaurant.latlng.lat,
+          lng: restaurant.lng || restaurant.latlng.lng
         },
-        streetViewControl: false,
-        mapTypeId: 'roadmap',
-        mapTypeControl: false,
+        streetViewControl: true,
+        mapTypeId: 'roadmap'
       })
       document.getElementById('map-container').appendChild(mapPlaceHolder);
       self.map.addListener('tilesloaded', function () {
@@ -73,8 +60,11 @@ const fetchRestaurantFromURL = () => {
   if (!id) { // no id found in URL
     return console.error('No restaurant id in URL');
   }
-  return DBHelper.fetchRestaurantById(id)
-    .then(restaurant => self.restaurant = restaurant)
+  return Promise.all([DBHelper.fetchRestaurantById(id), DBHelper.fetchReviews()])
+    .then(results => {
+      self.reviews = results[1];
+      return self.restaurant = results[0];
+    })
     .then(fillRestaurantHTML)
     .catch(error => console.error(error));
 };
@@ -85,7 +75,7 @@ const fetchRestaurantFromURL = () => {
 const fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
-  
+
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
   address.setAttribute('aria-label', `located at ${restaurant.address}`);
@@ -196,7 +186,14 @@ const fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hour
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+const fillReviewsHTML = (reviews = self.restaurant.reviews || self.reviews) => {
+  if (!reviews) {
+    const noReviews = document.createElement('p');
+    noReviews.innerHTML = 'No reviews yet!';
+    return container.appendChild(noReviews);
+  }
+  reviews = reviews.filter(review => review.restaurant_id === self.restaurant.id)
+  self.reviews = reviews;
   const container = document.getElementById('reviews-container');
   const titleContainer = document.createElement('div');
   const title = document.createElement('h3');
@@ -219,12 +216,6 @@ const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 
   container.appendChild(titleContainer);
 
-  if (!reviews) {
-    const noReviews = document.createElement('p');
-    noReviews.innerHTML = 'No reviews yet!';
-    container.appendChild(noReviews);
-    return;
-  }
   const ul = document.getElementById('reviews-list');
   reviews.forEach(review => {
     ul.appendChild(createReviewHTML(review));
@@ -341,6 +332,7 @@ const hideForm = () => {
  * Create review HTML and add it to the webpage.
  */
 const createReviewHTML = (review) => {
+
   const li = document.createElement('li');
   const name = document.createElement('p');
   name.className = 'userName';
@@ -352,7 +344,7 @@ const createReviewHTML = (review) => {
   date.className = 'dateReview';
   const convertDate = new Date(review.updatedAt);
   date.innerHTML = convertDate.toDateString();
-  date.setAttribute('aria-label', `${review.date},`);
+  date.setAttribute('aria-label', `${date.innerHTML},`);
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -376,8 +368,8 @@ const createReviewHTML = (review) => {
   li.appendChild(comments);
 
   li.setAttribute('role', 'listitem');
-  li.setAttribute('aria-setsize', self.restaurant.reviews.length);
-  li.setAttribute('aria-posinset', self.restaurant.reviews.indexOf(review)+1);
+  li.setAttribute('aria-setsize', self.reviews);
+  li.setAttribute('aria-posinset', self.reviews.indexOf(review)+1);
   return li;
 };
 

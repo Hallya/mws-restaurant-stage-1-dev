@@ -2,7 +2,7 @@ const idbKey = require('./indexedb');
 
 const scheme = 'http://',
   host = 'localhost',
-  port = ':3000',
+  port = ':1337',
   path = {
     restaurants: '/restaurants/',
     reviews: '/reviews/'
@@ -19,14 +19,14 @@ const DBHelper = {
   DATABASE_URL:{
     GET: {
       allRestaurants: () => fetch(baseURI + path.restaurants),
-      restaurant: (id) => fetch(baseURI + path.restaurants + id + path.reviews),
+      allReviews: () => fetch(baseURI + path.reviews),
+      restaurant: (id) => fetch(baseURI + path.restaurants + id ),
       setFavoriteRestaurants: (answer) => fetch(baseURI + path.restaurants + query.is_favorite + answer)
     },
     POST: {
       newReview: (body) => fetch(baseURI + path.reviews, {
         method: 'POST',
         headers: {
-          'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
@@ -55,29 +55,6 @@ const DBHelper = {
     .then(restaurants => {
       if (restaurants.length < 10) {
         return DBHelper.DATABASE_URL.GET.allRestaurants()
-          // .then((response) => {
-          //   const reader = response.body.getReader();
-          //   const stream = new ReadableStream({
-          //     start(controller) {
-          //       function push() {
-          //         reader.read().then(({done,value}) => {
-          //           if (done) {
-          //             controller.close();
-          //             return;
-          //           }
-          //           controller.enqueue(value);
-          //           push();
-          //         });
-          //       };
-          //       push();
-          //     }
-          //   });
-          //   return new Response(stream, {
-          //     headers: {
-          //       "Content-Type": "text/html"
-          //     }
-          //   });
-          // })
         .then(response => response.json())
         .then(restaurants => {
           console.log('- Restaurants data fetched !');
@@ -90,6 +67,32 @@ const DBHelper = {
         .catch(error => console.error(`Request failed. Returned status of ${error}`));
       } else {
         return restaurants;
+      }
+    }).catch(error => {
+      console.error(error)
+    });
+  },
+  /**
+   * Fetch all reviews.
+   */
+  fetchReviews: () => {
+    const store = 'reviews';
+    return idbKey.getAll(store)
+    .then(reviews => {
+      if (reviews.length < 10) {
+        return DBHelper.DATABASE_URL.GET.allReviews()
+        .then(response => response.json())
+        .then(reviews => {
+          console.log('- Reviews data fetched !');
+          return reviews.reviews || reviews;
+        })
+        .then(reviews => {
+          reviews.forEach(review => idbKey.set(store, review));
+          return reviews;
+        })
+        .catch(error => console.error(`Request failed. Returned status of ${error}`));
+      } else {
+        return reviews;
       }
     }).catch(error => {
       console.error(error)
@@ -190,20 +193,39 @@ const DBHelper = {
   imageWebpUrlForRestaurant: (restaurant) => {
     return (`assets/img/webp/${restaurant.photograph}`);
   },
+
   postReview: async (e) => {
     console.log('Trying to post review...')
     e.preventDefault();
-    const store = 'posts'
     const form = document.querySelector('#title-container form').elements;
     const body = {
-      "restaurant_id": window.location.search.match(/\d+/)[0],
-      "name": form["name"].value,
-      "rating": form["rating"].value,
-      "comments": form["comments"].value
+      restaurant_id: Number(window.location.search.match(/\d+/)[0]),
+      name: form["name"].value,
+      rating: Number(form["rating"].value),
+      comments: form["comments"].value,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
     }
-    idbKey.set(store, body);
+    await idbKey.set('posts', body);
+    await idbKey.addReview('reviews', body);
     const registration = await navigator.serviceWorker.ready
-    registration.sync.register('post-review').then(response => console.log('sync registration',response))
+    Notification.requestPermission()
+      .then(function (result) {
+        if (result === 'denied') {
+          console.log('Permission wasn\'t granted. Allow a retry.');
+          return;
+        }
+        if (result === 'default') {
+          console.log('The permission request was dismissed.');
+          return;
+        }
+        if (result === 'granted') { 
+          console.log('Notification allowed')
+        }
+      });
+    registration.sync.register('post-review');
+    location.reload();
+    registration.sync.getTags().then(res => console.log(res));
   },
   /**
    * Map marker for a restaurant.
@@ -211,8 +233,8 @@ const DBHelper = {
   mapMarkerForRestaurant: (restaurant, map) => {
     const marker = new google.maps.Marker({
       position: {
-        lat: restaurant.lat,
-        lng: restaurant.lng
+        lat: restaurant.lat || restaurant.latlng.lat,
+        lng: restaurant.lng || restaurant.latlng.lng
       },
       title: restaurant.name,
       url: DBHelper.urlForRestaurant(restaurant),

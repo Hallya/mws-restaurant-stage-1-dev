@@ -393,22 +393,24 @@ nav {
       border-bottom-left-radius: 25px;
       border-bottom-right-radius: 25px;
       background: $background-primary-color;
-      transition: 0.3s ease-in-out;
+      transition: transform  0.3s ease-in-out 0s, opacity 0s linear 0.3s;
       will-change: transform;
+      will-change: opacity;
+      transform: translateZ(0);
       transform: translateY(-14em);
-      opacity: 1;
-  @include m {
-    transform: translateY(-8em);
-    z-index: 1;
-    right: 0;
-  }
-  h3 {
-    color: #6d0090;
-    font-weight: normal;
+      opacity: 0;
+      @include m {
+        transform: translateY(-8em);
+        z-index: 1;
+        right: 0;
+      }
+      h3 {
+        color: #6d0090;
+        font-weight: normal;
     margin: 0%;
     width: 100%;
     font-size: 1.7em;
-
+    
     @include m {
       margin: 0;
       padding: 0;
@@ -429,9 +431,13 @@ nav {
 }
 
 .optionsOpen {
+  transform: translateZ(0);
   transform: translateY(0em);
+  transition: transform 0.3s ease-in-out 0s, opacity 0s linear 0s;
   visibility: visible;
   opacity: 1;
+  will-change: transform;
+  will-change: opacity;
   @include m {
     transform: translateY(4em);
   }

@@ -1,6 +1,7 @@
 const DBHelper =  require('./dbhelper');
 const launch = require('./helpers');
-
+// import launch from './helpers';
+// import DBHelper from './dbhelper';
 
 let restaurants;
 let neighborhoods;
@@ -44,9 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('load', () => {
   
   if ('serviceWorker' in navigator) {
+    console.log('Service worker available !')
     const pathToServiceWorker = window.location.hostname === 'hallya.github.io' ? '/mws-restaurant-stage-1/sw.js' : '../sw.js'
     navigator.serviceWorker.register(pathToServiceWorker)
-      .then(registration => console.log('registration to serviceWorker complete with scope :', registration.scope));
+      .then(registration => console.log('Registration to serviceWorker complete with scope :', registration.scope));
   }
 
   if (!window.navigator.standalone
@@ -155,7 +157,7 @@ window.initMap = () => {
 /**
  * Update page and map for current restaurants.
  */
-const updateRestaurants = () => {
+const updateRestaurants = async () => {
   const cSelect = cuisinesSelect;
   const nSelect = neighborhoodsSelect;
   const sSelect = sortSelect;
@@ -174,7 +176,13 @@ const updateRestaurants = () => {
   cuisine = cSelect[cIndex].value;
   neighborhood = nSelect[nIndex].value;
   sort = sSelect[sIndex].value;
-  return DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
+  
+  return Promise.all([DBHelper.fetchReviews(), DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)])
+    .then(results => {
+      self.reviews = results[0];
+      self.restaurants = results[1];
+      return results[1];
+    })
     .then(resetRestaurants)
     .then(sortRestaurantsBy)
     .then(generateRestaurantsHTML)
@@ -336,8 +344,7 @@ const createRestaurantHTML = (restaurant) => {
   image.alt = `${restaurant.name}'s restaurant`;
   image.type = 'image/jpeg';
   
-  note.innerHTML = `${restaurant.average_rating}/5`;
-
+  note.innerHTML = `${restaurant.average_rating || launch.getAverageNote(restaurant.id)}/5`;
   containerNote.append(note);
   containerNote.id = 'container-note';
 
