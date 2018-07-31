@@ -13,11 +13,11 @@ You are all set !
 
 #### Scores from Lighthouse audit :
 
-* Performance :* **100**,
-* Progressive web application :* **92**,
-* Accessibility :* **100**,
-* Best practices :* **87**,
-* SEO :* **100**
+Performance : **100**,
+Progressive web application : **92**,
+Accessibility : **100**,
+Best practices : **87**,
+SEO : **100**
 
 ---
 *Test realized the 31st of july 2018, on chrome canary version 70.0.3498.0 (64 bits) in fast 3G, 4x CPU slowdown conditions.*
