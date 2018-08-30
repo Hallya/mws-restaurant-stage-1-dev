@@ -11,6 +11,10 @@ Run in your terminal:
 You are all set !
 ---
 
+#### Dependency :
+
+You need to run the [node server](https://github.com/hallya/restaurant-reviews-api) too to make the app work !
+---
 #### Scores from Lighthouse audit :
 
 Performance : **100**,
