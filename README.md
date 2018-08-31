@@ -1,5 +1,5 @@
 # PWA Restaurant Reviews (Client Side)
-#### Installation
+## Installation
 
 Run in your terminal:
 1. `git clone https://github.com/hallya/restaurant-reviews.git`
@@ -7,9 +7,9 @@ Run in your terminal:
 3. `npm i`
 4. `npm start`
 You are all set !
-#### Dependency :
+## Dependency :
 You need to run the [node server](https://github.com/hallya/restaurant-reviews-api) too to make the app work !
-#### Scores from Lighthouse audit :
+### Scores from Lighthouse audit :
 Performance : **100**,
 Progressive web application : **92**,
 Accessibility : **100**,
