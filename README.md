@@ -2,10 +2,12 @@
 ## Installation
 
 Run in your terminal:
-1. `git clone https://github.com/hallya/restaurant-reviews.git`
-2. `cd restaurant-reviews`
-3. `npm i`
-4. `npm start`
+```
+$ git clone https://github.com/hallya/restaurant-reviews.git
+$ cd restaurant-reviews
+$ npm i
+$ npm start
+```
 You are all set !
 ## Dependency :
 You need to run the [node server](https://github.com/hallya/restaurant-reviews-api) too to make the app work !
