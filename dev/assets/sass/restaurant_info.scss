@@ -1,4 +1,3 @@
-@charset "utf-8";
 @font-face {
   font-family: 'Montserrat';
   font-style: normal;
@@ -365,8 +364,41 @@ nav {
       }
     }
     figure {
+      position: relative;
       @include l {
         width: 55%;
+      }
+      .container--favorite {
+        position: absolute;
+        bottom: 35px;
+        background: transparent;
+        border: none;
+        left: 1%;
+        margin: 0;
+        padding: 0;
+        z-index: 4;
+        height: 50px;
+        width: 50px;
+        @include l {
+          bottom: 55px;
+        }
+        @include xl {
+          bottom: 70px;
+        }
+      
+        #not-favorite, #favorite {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          margin: 0;
+          padding: 0;
+          z-index: 5;
+          transition: 0.3s ease;
+        }
+        #not-favorite.hidden {
+          opacity: 0;
+        }
       }
     }
     #restaurant-name {
@@ -415,6 +447,7 @@ nav {
     }
     #restaurant-img {
       width: 100%;
+      background: $background-secondary-color;
       border-top: 5px solid;
     }
     #restaurant-cuisine {
@@ -477,7 +510,8 @@ nav {
         width: auto;
       }
       @include l {
-        width: 40%;
+        width: 55%;
+        margin: 0 0px 0 50px;
       }
       @include xl {
         font-size: 1.1em;
@@ -544,6 +578,7 @@ nav {
         color: green;
         border-radius: 5px;
         font-size: 1.3em;
+        font-family: arial;
       }
       input {
         width: 60%;
@@ -726,21 +761,10 @@ nav {
         }
       }
     }
-    #star1 {
-      color: #ffa3a3;
+    .star1,.star2,.star3,.star4,.star5 {
+      color: $first-color;
     }
-    #star2 {
-      color:#ff7f7f;
-    }
-    #star3 {
-      color: #ff4747;
-    }
-    #star4 {
-      color:#d10000;
-    }
-    #star5 {
-      color: #b10000;
-    }
+  
     p {
       text-align: center;
       font-family: 'Montserrat', sans-serif;

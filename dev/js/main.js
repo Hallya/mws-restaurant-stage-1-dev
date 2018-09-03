@@ -1,15 +1,16 @@
 const DBHelper =  require('./dbhelper');
 const launch = require('./helpers');
+const idbKey = require('./indexedb');
 
-
-let restaurants;
-let neighborhoods;
-let cuisines;
-let loading = false;
-let markers = [];
-let cuisine;
-let neighborhood;
-let sort;
+let restaurants,
+neighborhoods,
+cuisines,
+loading = false,
+markers = [],
+cuisine,
+neighborhood,
+sort,
+favorites;
 
 const 
   filterOptions = document.querySelector('.filter-options'),
@@ -17,38 +18,35 @@ const
   listOfRestaurants = document.querySelector('#restaurants-list'),
   neighborhoodsSelect = document.querySelector('#neighborhoods-select'),
   cuisinesSelect = document.querySelector('#cuisines-select'),
+  favoritesCheckbox = document.querySelector('#favorites input'),
   sortSelect = document.querySelector('#sort-select'),
   loader = document.querySelector('#map-loader');
 
 /**
- * Fetch neighborhoods and cuisines as soon as the page is loaded.
+ * Try to register to service worker and fetch restaurants depending of filters as soon as the DOM is loaded.
  */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  if ('serviceWorker' in navigator) {
+    console.log('Service worker available !')
+    const pathToServiceWorker = window.location.hostname === 'hallya.github.io' ? '/mws-restaurant-stage-1/sw.js' : '../sw.js'
+    const registration = await navigator.serviceWorker.register(pathToServiceWorker).catch(error => console.error(error));
 
-  updateRestaurants()
-    .then(addSortOptions)
-    .then(addCuisinesOptions)
-    .then(addNeighborhoodsOptions)
-    .catch(error => console.error(error));
+    console.log('Registration to serviceWorker complete with scope :', registration.scope)
+    const isReady = await navigator.serviceWorker.ready.catch(error => console.error(error));
+    isReady.sync.register('post-review');
+  }
+  await updateRestaurants().catch(error => console.error(error));
+  await Promise.all([
+    addSortOptions(),
+    addCuisinesOptions(),
+    addNeighborhoodsOptions()
+  ]).catch(error => console.error(error));
 });
 
-
 /**
- * Open or close the options/filter menu.
- */
-
-
-/**
- * Register to service worker if the browser is compatible.
+ * Add event listeners to filters features.
  */
 window.addEventListener('load', () => {
-  
-  if ('serviceWorker' in navigator) {
-    const pathToServiceWorker = window.location.hostname === 'hallya.github.io' ? '/mws-restaurant-stage-1/sw.js' : '../sw.js'
-    navigator.serviceWorker.register(pathToServiceWorker)
-      .then(registration => console.log('registration to serviceWorker complete with scope :', registration.scope));
-  }
-
   if (!window.navigator.standalone
     && window.navigator.userAgent.indexOf('Android') === -1
     && window.navigator.userAgent.indexOf('Linux') === -1
@@ -59,31 +57,33 @@ window.addEventListener('load', () => {
   cuisinesSelect.addEventListener('change', updateRestaurants);
   neighborhoodsSelect.addEventListener('change', updateRestaurants);
   sortSelect.addEventListener('change', updateRestaurants);
-
+  favoritesCheckbox.addEventListener('change', updateRestaurants);
+  filterButton.addEventListener('click', launch.toggleMenu);
 });
     
-filterButton.addEventListener('click', launch.toggleMenu);
 
 /**
  * If select/filter menu is open, press enter will make the restaurants list focus.
  */
 document.onkeypress = function (e) {
   if (e.charCode === 13 && filterOptions.classList.contains('optionsOpen')) {
-    closeMenu();
+    launch.toggleMenu();
     listOfRestaurants.setAttribute('tabindex', '-1');
     listOfRestaurants.focus();
     document.getElementById('skip').click();
   }
 };
+
 /**
- * Fetch all neighborhoods and set their HTML.
+ * Get neighborhoods select options and add it.
  */
 const addNeighborhoodsOptions = (restaurants = self.restaurants) => {
   self.neighborhoods = DBHelper.addNeighborhoodsOptions(restaurants);
   fillNeighborhoodsHTML();
 };
+
 /**
- * Fetch all cuisines and set their HTML.
+ * Get cuisines select options and add it.
  */
 const addCuisinesOptions = (restaurants = self.restaurants) => {
   self.cuisines = DBHelper.addCuisinesOptions(restaurants);
@@ -91,7 +91,7 @@ const addCuisinesOptions = (restaurants = self.restaurants) => {
 };
 
 /**
- * Set neighborhoods HTML.
+ * Fill neighborhoods options.
  */
 const fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
   const select = neighborhoodsSelect;
@@ -105,8 +105,9 @@ const fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
     select.append(option);
   });
 };
+
 /**
- * Set cuisines HTML.
+ * Fill neighborhoods options.
  */
 const fillCuisinesHTML = (cuisines = self.cuisines) => {
   const select = cuisinesSelect;
@@ -122,7 +123,7 @@ const fillCuisinesHTML = (cuisines = self.cuisines) => {
 };
 
 /**
- * Initialize Google map, called from HTML.
+ * Initialize Google map, called from restaurant.html and switch loader to map when all tiles are loaded.
  */
 window.initMap = () => {
   
@@ -140,6 +141,8 @@ window.initMap = () => {
     center: loc,
     zoom: 12,
     streetViewControl: false,
+    zoomControl: true,
+    fullscreenControl: true,
     mapTypeId: 'roadmap',
     mapTypeControl: false,
   });
@@ -153,39 +156,48 @@ window.initMap = () => {
 };
 
 /**
- * Update page and map for current restaurants.
+ * Update list of restaurant depending on filters.
  */
-const updateRestaurants = () => {
-  const cSelect = cuisinesSelect;
-  const nSelect = neighborhoodsSelect;
-  const sSelect = sortSelect;
+const updateRestaurants = async () => {
+  const cSelect = cuisinesSelect,
+    nSelect = neighborhoodsSelect,
+    sSelect = sortSelect,
 
-  const cIndex = cSelect.selectedIndex;
-  const nIndex = nSelect.selectedIndex;
-  const sIndex = sSelect.selectedIndex;
+  cIndex = cSelect.selectedIndex,
+  nIndex = nSelect.selectedIndex,
+  sIndex = sSelect.selectedIndex;
 
   if (cuisine === cSelect[cIndex].value
     && neighborhood === nSelect[nIndex].value
-    && sort === sSelect[sIndex].value) {
+    && sort === sSelect[sIndex].value
+    && favorites === favoritesCheckbox.checked) {
     
-    console.log('- Restaurants list already update');
     return Promise.resolve();
   }
+  
   cuisine = cSelect[cIndex].value;
   neighborhood = nSelect[nIndex].value;
   sort = sSelect[sIndex].value;
-  return DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
-    .then(resetRestaurants)
-    .then(sortRestaurantsBy)
-    .then(generateRestaurantsHTML)
-    .then(() => console.log('- Restaurants list updated !'))
-    .catch(error => console.error(error))
+  favorites = favoritesCheckbox.checked;
+  
+  const results = await Promise.all([
+    DBHelper.fetchReviews(),
+    DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
+  ]).catch(error => console.error(error))
+
+  self.reviews = results[0];
+  self.restaurants = results[1];
+
+  await resetRestaurants();
+  await sortRestaurantsBy();
+  await generateRestaurantsHTML(getFavorites());
+  console.log('- Restaurants list updated !');
 };
 
 /**
  * Clear current restaurants, their HTML and remove their map markers.
  */
-const resetRestaurants = (restaurants) => {
+const resetRestaurants = (restaurants = self.restaurants) => {
   // Remove all restaurants
   self.restaurants = [];
   const ul = document.getElementById('restaurants-list');
@@ -200,6 +212,9 @@ const resetRestaurants = (restaurants) => {
   return restaurants;
 };
 
+/**
+ * Add sort options in filter menu.
+ */
 const addSortOptions = () => {
   sortOptions = ['Note', 'A-Z', 'Z-A'];
   sortOptions.forEach(sortOption => {
@@ -213,6 +228,20 @@ const addSortOptions = () => {
   });
 }
 
+/**
+ * Filter favorites restaurants from others.
+ */
+const getFavorites = (restaurants = self.restaurants) => {
+  favorites && document.getElementById('favorites').classList.add('active');
+  !favorites && document.getElementById('favorites').classList.remove('active');
+  return restaurants
+    .filter(restaurant => favorites && restaurant.is_favorite === 'true' || !favorites && restaurant
+    );
+}
+
+/**
+ * Sort restaurants.
+ */
 const sortRestaurantsBy = (restaurants = self.restaurants) => {
   const sIndex = sortSelect.selectedIndex;
   switch (sortSelect[sIndex].value) {
@@ -230,51 +259,14 @@ const sortRestaurantsBy = (restaurants = self.restaurants) => {
       break;
   }
 }
-/**
- * Create all restaurants HTML and add them to the webpage.
- */
-function* restaurantGenerator(restaurants = self.restaurants) {
-  let i = 0
-  while (restaurants[i]) {
-    const restaurant = createRestaurantHTML(restaurants[i]);
-    yield restaurant;
-    i++;
-  }
-}
 
+/**
+ * Iterate on list of restaurants to create them.
+ */
 const generateRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
   restaurants.forEach(restaurant => ul.append(createRestaurantHTML(restaurant)));
   return launch.lazyLoading();
-  // if ('IntersectionObserver' in window) {
-    
-  //   const options = {
-  //     root: null,
-  //     threshold: [0],
-  //     rootMargin: "600px"
-  //   }
-
-  //   let lazyRestaurantObserver = new IntersectionObserver(function (entries, observer) {
-      
-  //     entries.forEach(function (entry) {
-        
-  //       if (entry.isIntersecting) {
-          
-  //         lazyRestaurantObserver.unobserve(entry.target);
-          
-  //         const restaurant = pushRestaurants.next();
-  //         if (!restaurant.done) {
-  //           ul.append(restaurant.value);
-  //           lazyRestaurantObserver.observe(restaurant.value);
-  //           launch.lazyLoading()
-  //         }
-  //       }
-  //     });
-  //   }, options);
-
-  //   const pushRestaurants = restaurantGenerator()
-  //   lazyRestaurantObserver.observe(listOfRestaurants)
-  // }
 };
 
 /**
@@ -295,17 +287,22 @@ const createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
   const containerNote = document.createElement('aside');
   const note = document.createElement('p');
+  const containerFavorite = document.createElement('button');
+  const notFavorite = document.createElement('img');
+  const favorite = document.createElement('img');
+
 
   sourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-large_x1.webp 1x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-large_x2.webp 2x`;
   sourceWebp.srcset = 'assets/img/svg/puff.svg';
   sourceWebp.media = '(min-width: 1000px)';
-  sourceWebp.className = 'lazy';
   sourceWebp.type = 'image/webp';
+  sourceWebp.className = 'lazy';
   source.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-large_x1.jpg 1x, ${DBHelper.imageUrlForRestaurant(restaurant)}-large_x2.jpg 2x`;
   source.srcset = 'assets/img/svg/puff.svg';
   source.media = '(min-width: 1000px)';
   source.className = 'lazy';
   source.type = 'image/jpeg';
+  source.onerror = "this.onerror=null;this.src='assets/img/svg/no-wifi.svg';"
   
   secondSourceWebp.dataset.srcset = `${DBHelper.imageWebpUrlForRestaurant(restaurant)}-medium_x1.webp 1x, ${DBHelper.imageWebpUrlForRestaurant(restaurant)}-medium_x2.webp 2x`;
   secondSourceWebp.srcset = 'assets/img/svg/puff.svg';
@@ -326,7 +323,7 @@ const createRestaurantHTML = (restaurant) => {
   thSource.dataset.srcset = `${DBHelper.imageUrlForRestaurant(restaurant)}-small_x2.jpg 2x, ${DBHelper.imageUrlForRestaurant(restaurant)}-small_x1.jpg 1x`;
   thSource.srcset = 'assets/img/svg/puff.svg';
   thSource.media = '(min-width: 320px)';
-  thSource.className = 'lazy';
+
   thSource.type = 'image/jpeg';
   
   image.dataset.src = `${DBHelper.imageUrlForRestaurant(restaurant)}-small_x1.jpg`;
@@ -336,10 +333,32 @@ const createRestaurantHTML = (restaurant) => {
   image.alt = `${restaurant.name}'s restaurant`;
   image.type = 'image/jpeg';
   
-  note.innerHTML = `${restaurant.average_rating}/5`;
+  restaurant.average_rating = launch.getAverageNote(restaurant.id);
 
+  note.innerHTML = `${restaurant.average_rating}`;
+  note.setAttribute('aria-hidden', 'true');
   containerNote.append(note);
-  containerNote.id = 'container-note';
+  containerNote.className = 'container-note';
+  containerNote.tabIndex = 0;
+  containerNote.setAttribute('aria-label', `${restaurant.name} has a rate of ${restaurant.average_rating.replace('/5', ' on 5')}`)
+
+  containerFavorite.className = 'container--favorite';
+  containerFavorite.id = restaurant.id;
+  containerFavorite.role = 'button';
+  containerFavorite.setAttribute('aria-label', restaurant.is_favorite === 'true' ? `unset ${restaurant.name} as favorite`:`set ${restaurant.name} as favorite`);
+  containerFavorite.addEventListener('click',
+    () => DBHelper.setFavorite(notFavorite, restaurant, containerFavorite, favorite));
+  notFavorite.src = 'assets/img/svg/not-favorite.svg';
+  notFavorite.className = `not-favorite ${restaurant.is_favorite === 'true' && 'hidden'}`;
+  notFavorite.setAttribute('aria-hidden', restaurant.is_favorite === 'true' ? 'true':'false');
+  notFavorite.alt = 'unfavorite restaurant';
+  favorite.src = 'assets/img/svg/favorite.svg';
+  favorite.className = 'favorite';
+  favorite.setAttribute('aria-hidden', restaurant.is_favorite === 'true' ? 'false':'true');
+  favorite.alt = 'favorite restaurant';
+
+  containerFavorite.append(favorite);
+  containerFavorite.append(notFavorite);
 
   picture.append(sourceWebp);
   picture.append(source);
@@ -351,6 +370,7 @@ const createRestaurantHTML = (restaurant) => {
 
   const more = document.createElement('a');
   more.innerHTML = '';
+  more.tabIndex = 0;
   more.className = 'fontawesome-arrow-right';
   more.dataset.url = DBHelper.urlForRestaurant(restaurant);
   more.addEventListener('click', launch.goToRestaurantPage)
@@ -358,9 +378,11 @@ const createRestaurantHTML = (restaurant) => {
   more.setAttribute('rel', 'noopener');
 
   figure.append(picture);
+  figure.append(containerFavorite);
   figcaption.append(more);
   figure.append(figcaption);
   
+  li.tabIndex = 0;
   li.append(containerNote);
   li.append(figure);
   
@@ -396,7 +418,6 @@ const addMarkersToMap = (restaurants = self.restaurants) => {
   });
 };
 
-
 /**
  * Create a banner to notified the possibility to add the page as an app.
  */
@@ -410,9 +431,9 @@ const addBannerToHomeScreen = () => {
   
   aside.className = 'popup';
   msg.className = 'popup msg';
-  msg.setAttribute('tabindex', '2');
+  msg.setAttribute('tabindex', '0');
   note.className = 'popup note';
-  note.setAttribute('tabindex', '1');
+  note.setAttribute('tabindex', '0');
   span.className = 'iconicfill-arrow-down';
   
   note.innerHTML = '(Tap to close)';

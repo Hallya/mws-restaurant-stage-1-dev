@@ -26,6 +26,9 @@
     <link rel="icon" type="image/png" href="assets/img/png/logo-256.png" sizes="256x256" />
     <link rel="icon" type="image/png" href="assets/img/png/logo-512.png" sizes="512x512" />
     <link rel="stylesheet" href="assets/css/restaurant_info.css">
+    <link rel="image" href="assets/img/svg/no-wifi.svg">
+    <link rel="image" href="assets/img/svg/not-favorite.svg">
+    <link rel="image" href="assets/img/svg/favorite.svg">
     <link rel="manifest" href="manifest.webmanifest">
     <title>Restaurant Info</title>
     <style>
@@ -35,14 +38,12 @@
 
   <body class="inside">
     <header>
-
       <nav>
-        <h1><a href="#" rel="noopener">Restaurant Reviews</a></h1>
+        <h1><a aria-hidden="true" tabindex="-1" href="#" rel="noopener">Restaurant Reviews</a></h1>
       </nav>
       <ul id="breadcrumb" aria-label="Breadcrumb" role="navigation">
-        <li><a href="index.html" rel="noopener">Home</a></li>
+        <li><a href="index.html" aria-label="go to home page" rel="noopener">Home</a></li>
       </ul>
-
     </header>
 
 
@@ -52,7 +53,7 @@
       
       <section id="map-container" aria-label="map" role="application">
         <aside id="map-loader">
-          <img id="loader" src="assets/img/svg/map-loader.svg">
+          <img id="loader" src="assets/img/svg/map-loader.svg" alt="loading google map and markers">
         </aside>
       </section>
       
@@ -61,16 +62,16 @@
         <figure>
           <h2 id="restaurant-name"></h2>
           <figcaption>
-            <p id="restaurant-cuisine" tabindex="1" aria-labelledby="foodType"></p>
+            <p id="restaurant-cuisine" tabindex="0" aria-labelledby="foodType"></p>
           </figcaption>
         </figure>
-        <p id="restaurant-address" tabindex="2"></p>
-        <table id="restaurant-hours" role="table" tabindex="3"></table>
+        <p id="restaurant-address" tabindex="0"></p>
+        <table id="restaurant-hours" role="table" tabindex="0"></table>
       </section>
       
       
       <section id="reviews-container" aria-label="reviews from customers">
-        <ul id="reviews-list" tabindex="4" role="list"></ul>
+        <ul id="reviews-list" tabindex="0" role="list"></ul>
       </section>
     </main>
 

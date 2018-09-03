@@ -6,77 +6,84 @@ var map;
 
 const mapLoader = document.getElementById('map-loader');
 
-window.addEventListener('load', () => {
-  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+/**
+ * Try to register to service worker.
+ */
+window.addEventListener('DOMContentLoaded', async () => {
+  if ('serviceWorker' in navigator) {
     const pathToServiceWorker = window.location.hostname === 'hallya.github.io' ? '/mws-restaurant-stage-1/sw.js' : '../sw.js'
-    navigator.serviceWorker.register(pathToServiceWorker)
-      .then(registration => {
-        console.log('registration to serviceWorker complete with scope :', registration.scope);
-        Notification.requestPermission().then(function (result) {
-          if (result === 'denied') {
-            console.log('Permission wasn\'t granted. Allow a retry.');
-            return;
-          }
-          if (result === 'default') {
-            console.log('The permission request was dismissed.');
-            return;
-          }
-          if (result === 'granted') { 
-            console.log('Notification allowed')
-          }
-        });
-      });
+    const registration = await navigator.serviceWorker.register(pathToServiceWorker).catch(error => console.error('Couldn\'t register to SW'))
+    console.log('Registration to SW succeed with scope', registration.scope);
   }
-});
+})
+
+/**
+ * Try to register to tag events.
+ */
+window.addEventListener('load', async () => {
+  if ('serviceWorker' in navigator) {
+    const registration = await navigator.serviceWorker.ready.catch(error => console.error('Couldn\'t get registration object from SW'))
+    registration.sync.register('post-review');
+    registration.sync.register('fetch-new-reviews');
+    console.log('Registered to SW & "post-review" sync tag & "fetch-new-reviews" tag')
+  }
+})
+
 /**
  * Initialize Google map, called from HTML.
  */
-window.initMap = () => {
-  fetchRestaurantFromURL()
-    .then(restaurant => {
-      const mapPlaceHolder = document.createElement('div');
-      mapPlaceHolder.setAttribute('tabindex', '-1');
-      mapPlaceHolder.setAttribute('aria-hidden', 'true');
-      mapPlaceHolder.id = "map";
-      self.map = new google.maps.Map(mapPlaceHolder, {
-        zoom: 16,
-        center: {
-          lat: restaurant.lat,
-          lng: restaurant.lng
-        },
-        streetViewControl: false,
-        mapTypeId: 'roadmap',
-        mapTypeControl: false,
-      })
-      document.getElementById('map-container').appendChild(mapPlaceHolder);
-      self.map.addListener('tilesloaded', function () {
-        // if (mapLoader.classList.contains('hidden'){
-          mapLoader.classList.toggle('hidden');
-        // }
-      });
-      DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
-      fillBreadcrumb();
-    })
-    .then(Launch.lazyLoading)
-    .catch(error => console.error(error));
+window.initMap = async () => {
+  const restaurant = await fetchRestaurantFromURL().catch(error => console.error(error));
+  const mapPlaceHolder = document.createElement('div');
+
+  mapPlaceHolder.setAttribute('aria-hidden', 'true');
+  mapPlaceHolder.setAttribute('aria-hidden', 'true');
+  mapPlaceHolder.id = "map";
+
+  self.map = new google.maps.Map(mapPlaceHolder, {
+    zoom: 16,
+    center: {
+      lat: restaurant.latlng.lat,
+      lng: restaurant.latlng.lng
+    },
+    streetViewControl: false,
+    zoomControl: true,
+    fullscreenControl: true,
+    mapTypeId: 'roadmap',
+    mapTypeControl: false,
+  })
+
+  document.getElementById('map-container').appendChild(mapPlaceHolder);
+  self.map.addListener('tilesloaded', function () {
+      mapLoader.classList.toggle('hidden');
+  });
+  DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+  fillBreadcrumb();
+  Launch.lazyLoading()
 };
 
 /**
- * Get current restaurant from page URL.
+ * Get restaurant from id in URL.
  */
-const fetchRestaurantFromURL = () => {
+const fetchRestaurantFromURL = async () => {
   if (self.restaurant) { // restaurant already fetched!
-    console.log('- Restaurant already fetch');
     return;
   }
   const id = getParameterByName('id');
+
   if (!id) { // no id found in URL
     return console.error('No restaurant id in URL');
   }
-  return DBHelper.fetchRestaurantById(id)
-    .then(restaurant => self.restaurant = restaurant)
-    .then(fillRestaurantHTML)
-    .catch(error => console.error(error));
+
+  const results = await Promise.all([
+    DBHelper.fetchRestaurantById(id),
+    DBHelper.fetchRestaurantReviews(id)
+  ]).catch(error => console.error(error));
+
+  self.reviews = results[1] && results[1].reverse();
+  self.restaurant = results[0];
+
+  return fillRestaurantHTML();
 };
 
 /**
@@ -85,7 +92,7 @@ const fetchRestaurantFromURL = () => {
 const fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
-  
+
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
   address.setAttribute('aria-label', `located at ${restaurant.address}`);
@@ -142,6 +149,30 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   image.alt = `${restaurant.name}'s  restaurant`;
   image.type = 'image/jpeg';
 
+  const containerFavorite = document.createElement('button');
+  const notFavorite = document.createElement('img');
+  const favorite = document.createElement('img');
+
+  containerFavorite.role = 'button';
+  containerFavorite.id = restaurant.id;
+  containerFavorite.className = 'container--favorite';
+  containerFavorite.addEventListener('click',
+    () => DBHelper.setFavorite(notFavorite, restaurant, containerFavorite, favorite));
+  containerFavorite.setAttribute('aria-label', restaurant.is_favorite === 'true' ? `unset ${restaurant.name} as favorite`:`set ${restaurant.name} as favorite`);
+  notFavorite.id = 'not-favorite';
+  notFavorite.alt = 'unfavorite restaurant';
+  notFavorite.src = 'assets/img/svg/not-favorite.svg';
+  notFavorite.className = restaurant.is_favorite === 'true' && 'hidden';
+  notFavorite.setAttribute('aria-hidden', restaurant.is_favorite === 'true' ? 'true':'false');
+  favorite.id = 'favorite';
+  favorite.alt = 'favorite restaurant';
+  favorite.src = 'assets/img/svg/favorite.svg';
+  favorite.setAttribute('aria-hidden', restaurant.is_favorite === 'true' ? 'false' : 'true');
+
+
+  containerFavorite.append(favorite);
+  containerFavorite.append(notFavorite);
+  
   picture.appendChild(sourceWebp);
   picture.appendChild(source);
   picture.appendChild(ndSourceWebp);
@@ -150,6 +181,7 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   picture.appendChild(thSource);
   picture.appendChild(image);
   figure.insertBefore(picture, figcaption);
+  figure.append(containerFavorite);
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
@@ -192,11 +224,10 @@ const fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hour
   }
 };
 
-
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+const fillReviewsHTML = (reviews = self.reviews) => {
   const container = document.getElementById('reviews-container');
   const titleContainer = document.createElement('div');
   const title = document.createElement('h3');
@@ -222,9 +253,9 @@ const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   if (!reviews) {
     const noReviews = document.createElement('p');
     noReviews.innerHTML = 'No reviews yet!';
-    container.appendChild(noReviews);
-    return;
+    return container.appendChild(noReviews);
   }
+
   const ul = document.getElementById('reviews-list');
   reviews.forEach(review => {
     ul.appendChild(createReviewHTML(review));
@@ -232,13 +263,16 @@ const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   container.appendChild(ul);
 };
 
-const showForm = () => {
+/**
+ * create and display a form on click event.
+ */
+const showForm = async () => {
 
   const form = document.createElement('form');
   const labelNameInput = document.createElement('label');
   const nameInput = document.createElement('input');
   const ratingFieldset = document.createElement('fieldset');
-  const appreciation = ['excellent', 'good', 'ok', 'bad', 'awful'];
+  const appreciation = ['awful', 'bad', 'ok', 'good', 'excellent'];
   
   form.autocomplete = 'on';
 
@@ -264,14 +298,14 @@ const showForm = () => {
     
     starInput.type = 'radio';
     starInput.id = `star${i}`;
+    starInput.setAttribute('aria-label', `It was ${appreciation[i - 1]}`);
     starInput.name = 'rating';
     starInput.value = i;
-    starInput.class = 'visuallyHidden';
+    starInput.value = i;
     starInput.required = true;
     starInput.addEventListener('input', Launch.isFormValid);
     
-    starLabel.setAttribute('for', `star${i}`);
-    starLabel.title = 'It was', appreciation[i - 1];
+    starLabel.for = `star${i}`;
     
 
     ratingFieldset.appendChild(starInput);
@@ -290,6 +324,7 @@ const showForm = () => {
   commentsInput.minLength = 3;
   commentsInput.maxLength = 5000;
   commentsInput.placeholder = 'Your comment';
+  commentsInput.setAttribute('aria-label', `Type your comments about your experience`)
   commentsInput.addEventListener('keydown', autosize);
 
   
@@ -324,9 +359,26 @@ const showForm = () => {
   }, 300)
   document.querySelector('#title-container button').removeEventListener('click', showForm);
   document.querySelector('#title-container button').addEventListener('click', hideForm);
-  document.querySelectorAll('#title-container button span').forEach(span => span.classList.toggle('toggled'))
+  document.querySelectorAll('#title-container button span').forEach(span => span.classList.toggle('toggled'));
+  const result = await Notification.requestPermission();
+  switch (result) {
+    case 'denied':
+      return console.log('Permission wasn\'t granted. Allow a retry.');
+      break;
+    case 'default':
+      return console.log('The permission request was dismissed.');
+      break;
+    case 'granted':
+      return console.log('Notification allowed');
+      break;
+    default:
+      return;
+  }
 }
 
+/**
+ * hide and remove the form on click event.
+ */
 const hideForm = () => {
   document.querySelector('#title-container form').classList.toggle('form-toggled');
   document.getElementById('title-container').classList.toggle('form-open');
@@ -341,6 +393,7 @@ const hideForm = () => {
  * Create review HTML and add it to the webpage.
  */
 const createReviewHTML = (review) => {
+
   const li = document.createElement('li');
   const name = document.createElement('p');
   name.className = 'userName';
@@ -350,9 +403,9 @@ const createReviewHTML = (review) => {
 
   const date = document.createElement('p');
   date.className = 'dateReview';
-  const convertDate = new Date(review.updatedAt);
+  const convertDate = new Date(Number(review.updatedAt));
   date.innerHTML = convertDate.toDateString();
-  date.setAttribute('aria-label', `${review.date},`);
+  date.setAttribute('aria-label', `${date.innerHTML},`);
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -362,7 +415,7 @@ const createReviewHTML = (review) => {
   for (let i = 0; i < review.rating; i++) {
     const star = document.createElement('span');
     star.innerHTML += '★';
-    star.id = `star${i + 1}`
+    star.className = `star${i + 1}`
     stars.appendChild(star);
   }
   stars.setAttribute('aria-label', `${review.rating} stars on 5,`);
@@ -376,8 +429,9 @@ const createReviewHTML = (review) => {
   li.appendChild(comments);
 
   li.setAttribute('role', 'listitem');
-  li.setAttribute('aria-setsize', self.restaurant.reviews.length);
-  li.setAttribute('aria-posinset', self.restaurant.reviews.indexOf(review)+1);
+  li.tabIndex = 0;
+  li.setAttribute('aria-setsize', self.reviews.length);
+  li.setAttribute('aria-posinset', self.reviews.indexOf(review)+1);
   return li;
 };
 
@@ -389,6 +443,7 @@ const fillBreadcrumb = (restaurant = self.restaurant) => {
   const li = document.createElement('li');
   li.innerHTML = ` ${restaurant.name}`;
   li.className = 'fontawesome-arrow-right';
+  li.tabIndex = 0;
   li.setAttribute('aria-current', 'page');
   breadcrumb.appendChild(li);
   Launch.fixedOnViewport(document.querySelector('nav'), document.querySelector('#breadcrumb'));
@@ -410,7 +465,9 @@ const getParameterByName = (name, url) => {
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 };
 
-
+/**
+ * Modify text area heigth to adapt the content.
+ */
 function autosize() {
   const el = this;
   document.getElementById('title-container').style.height = 'auto';

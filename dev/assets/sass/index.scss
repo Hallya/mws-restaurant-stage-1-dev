@@ -77,6 +77,8 @@ $background-secondary-color: #252831;
 [class*="fontawesome-"]:before {
   content: '\f061';
   font-family: 'breadcrumb', sans-serif;
+  position: absolute;
+  right: 17px;
 }
 
 
@@ -376,27 +378,29 @@ nav {
 /* ====================== Restaurant Filtering ====================== */
 
 .filter-options {
-      position: absolute;
-      box-shadow: $box-shadow;
-      z-index: 1;
-      top: 0;
-      left: 0;
-      right: 20vw;
-      padding: 10px;
-      display: flex;
-      flex-flow: wrap row;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      overflow: hidden;
-      border-bottom: 3px solid #ff0404;
-      border-bottom-left-radius: 25px;
-      border-bottom-right-radius: 25px;
-      background: $background-primary-color;
-      transition: 0.3s ease-in-out;
-      will-change: transform;
-      transform: translateY(-14em);
-      opacity: 1;
+  position: absolute;
+  box-shadow: $box-shadow;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 20vw;
+  padding: 10px;
+  display: flex;
+  flex-flow: wrap row;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+  border-bottom: 3px solid #ff0404;
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
+  background: $background-primary-color;
+  transition: transform  0.3s ease-in, opacity 0s linear 0.3s;
+  will-change: transform;
+  will-change: opacity;
+  transform: translateZ(0);
+  transform: translateY(-14em);
+  opacity: 0;
   @include m {
     transform: translateY(-8em);
     z-index: 1;
@@ -408,30 +412,56 @@ nav {
     margin: 0%;
     width: 100%;
     font-size: 1.7em;
-
+    
     @include m {
       margin: 0;
       padding: 0;
       text-align: center;
     }
   }
-  
-  select {
+  #favorites, select {
+    width: 220px;
+    margin: 10px;
+    font-family: 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    border-radius: 5px;
     background-color: transparent;
     border: 1px solid #e6e6e6;
     color: $second-color;
     font-size: 1.3em;
     height: 35px;
     letter-spacing: 0;
-    margin: 10px;
-    width: 200px;
+    padding-left: 10px;
+    text-align: left;
+  }
+  label#favorites {
+    width: 207px;
+    transition: .3s;
+
+    &.active {
+      background: $first-color;
+      color: white;
+    }
+    input[type="checkbox"] {
+      opacity: 0;
+      width: 0px;
+      padding: 0;
+      margin: 0;
+
+      &:checked {
+        color: red;
+      }
+    }
   }
 }
 
 .optionsOpen {
+  transform: translateZ(0);
   transform: translateY(0em);
+  transition: transform 0.3s ease-in, opacity 0s linear 0s;
   visibility: visible;
   opacity: 1;
+  will-change: transform;
+  will-change: opacity;
   @include m {
     transform: translateY(4em);
   }
@@ -531,6 +561,34 @@ nav {
     @include xl {
       width: 25%;
     }
+    .container--favorite {
+      position: absolute;
+      background: transparent;
+      border: none;
+      bottom: 18%;
+      left: 2%;
+      margin: 0;
+      padding: 0;
+      z-index: 5;
+      height: 50px;
+      width: 50px;
+      @include xl {
+        bottom: 16%;
+      }
+      .not-favorite, .favorite {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        margin: 0;
+        padding: 0;
+        z-index: 5;
+        transition: 0.3s ease;
+      }
+      .not-favorite.hidden {
+        opacity: 0;
+      }
+    }
     h2   {
       text-align: left;
       color: $first-color;
@@ -538,7 +596,7 @@ nav {
       height: 3em;
       margin: 0 auto;
       font-family: 'Righteous', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-      font-size: 14pt;
+      font-size: 13pt;
       font-weight: 200;
       letter-spacing: 2px;
       line-height: 3em;
@@ -560,7 +618,7 @@ nav {
       border-top-right-radius: 25px;
       border-top-left-radius: 25px;
     }
-    #container-note {
+    .container-note {
       position: absolute;
       top: 0;
       right: 0;

@@ -12,6 +12,7 @@
   <link rel="preload" href="assets/img/svg/map-loader.svg" as="image">
   <link rel="preload" href="assets/img/svg/puff.svg" as="image">
   <link rel="preload" href="/assets/img/svg/marker.svg" as="image">
+  <link rel="preload" href="sw.js" as="script">
   <link rel="prefetch" href="restaurant.html">
   <link rel="apple-touch-startup-image" href="assets/img/png/launchScreen-ipad-9.7.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait)"
     sizes="1536x2048">
@@ -39,10 +40,10 @@
   <link rel="image" href="assets/img/svg/map-loader.svg">
   <link rel="image" href="assets/img/svg/puff.svg">
   <link rel="image" href="assets/img/svg/marker.svg">
+  <link rel="image" href="assets/img/svg/no-wifi.svg">
+  <link rel="image" href="assets/img/svg/not-favorite.svg">
+  <link rel="image" href="assets/img/svg/favorite.svg">
   <link rel="manifest" href="manifest.webmanifest">
-  <style>
-   
-  </style>
   <title>Restaurant Reviews</title>
 </head>
 
@@ -55,29 +56,34 @@
         <button id="menuFilter" class="iconicfill-equalizer" role="button" aria-labelledby="filtersSettings"></button>
       <label id="filtersSettings" hidden>Filter settings</label>
     </nav>
-    <aside class="filter-options" role="menu" aria-hidden="true">
-      <h3 id="filters" aria-label="filter results"></h3>
+    <aside class="filter-options" role="menu" hidden>
+      <h3 id="filters" aria-label="filters menu"></h3>
       <label id="location" hidden>Choose your location</label>
-      <select id="neighborhoods-select" aria-labelledby="location" name="neighborhoods">
+      <select id="neighborhoods-select" role="listbox" hidden aria-labelledby="location" name="neighborhoods">
         <option value="all" role="option" aria-setsize="4" aria-posinset="1">All Neighborhoods</option>
       </select>
       <label id="cuisines" hidden>Choose your type of food</label>
-      <select id="cuisines-select" aria-labelledby="cuisines" name="cuisines">
+      <select id="cuisines-select" role="listbox" hidden aria-labelledby="cuisines" name="cuisines">
         <option value="all" role="option" aria-setsize="4" aria-posinset="1">All Cuisines</option>
       </select>
-      <label id="sort" hidden>Choose your type of food</label>
-      <select id="sort-select" aria-labelledby="sort" name="sort">
+      <label id="sort" hidden>Sort restaurants</label>
+      <select id="sort-select" role="listbox" hidden aria-labelledby="sort" name="sort">
         <option value="Relevance" role="option" aria-setsize="4" aria-posinset="1">Relevant</option>
       </select>
+      <label id="favorites" hidden>
+        <input aria-labelledby="favorites" role="menuitemcheckbox" type="checkbox">
+          Favorites
+        </input>
+      </label>
     </aside>
   </header>
 
   <main id="maincontent">
-    <a id="skip" href="#list-container" aria-label="Skip to the list of restaurant" role="link"></a>
+    <a id="skip" href="#restaurants-list" aria-label="Skip to the list of restaurant" role="link"></a>
 
     <section id="map-container" aria-label="map" role="application">
       <aside id="map-loader">
-        <img id="loader" src="assets/img/svg/map-loader.svg">
+        <img id="loader" src="assets/img/svg/map-loader.svg" alt="loading google map and markers">
       </aside>
     </section>
 
@@ -92,6 +98,7 @@
       <strong>Restaurant Reviews</strong>
     </a> All Rights Reserved.
   </footer>
+  <script type="application/javascript" charset="utf-8" src="sw.js"></script>
   <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhh8UfYBFgAt3jlejXNTbrAuCnJqQtIPc&libraries=places&callback=initMap"></script>
 </body>
