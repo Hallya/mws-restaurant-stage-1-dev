@@ -20,7 +20,7 @@
 
 $screen-s-min: 320px;
 $screen-m-min: 550px;
-$screen-l-min: 1000px;
+$screen-l-min: 1050px;
 $screen-xl-min: 2000px;
 $first-color: #ca0000;
 $second-color: black;
@@ -252,6 +252,7 @@ nav {
         font-size: 1.3em;
         background-color: $first-color;
         border-radius: 25px;
+        padding: 0 5px;
       }
       @include xl {
         font-size: 3em;
@@ -409,13 +410,14 @@ nav {
       font-weight: 200;
       letter-spacing: 0;
       margin: 10px auto;
-      box-shadow: $box-shadow;
+      // box-shadow: $box-shadow;
       border-radius: 25px;
       text-transform: uppercase;
       line-height: 1.1;
       @include m {
         border-top-left-radius: 25px;
         border-top-right-radius: 25px;
+        text-shadow: 1px 6px 4px #0000003b;
       }
       @include l {
         width: 96%;
@@ -483,10 +485,11 @@ nav {
       font-size: 1em;
       border-radius: 25px;
       color: $second-color;
-      margin: 0;
+      margin: 5px;
       @include m {
         font-size: 1.2em;
-        box-shadow: none;
+        
+        text-shadow: 1px 6px 4px #0000003b;
       }
       @include l {
         font-size: 1.5em;

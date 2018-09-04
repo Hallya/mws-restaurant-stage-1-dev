@@ -340,7 +340,7 @@ const window = (typeof self === 'object' && self.self === self && self) ||
 const idbKey = require('./js/indexedb');
 const DBHelper = require('./js/dbhelper');
 
-const version = 3;
+const version = 5;
 /**
  * Object containing different cache names.
  */
@@ -533,7 +533,7 @@ async function postLocalReviews(count = 0) {
  */
 const fetchLastReviews = async () => {
   const clients = await self.clients.matchAll();
-  const id = clients.replace(window.location.host, '').match(/\d+/)[0];
+  const id = clients[0].url.replace(window.location.host, '').match(/\d+/)[0];
   const response = await DBHelper.DATABASE_URL.GET.restaurantReviews(id);
   const reviews = await response.json(),
     store = 'reviews';
